@@ -34,17 +34,17 @@
         <form class="form-horizontal" method="post" action="">
         <fieldset>
           {% csrf_token %}
-        <div id="edit_farmer" style="display:none"></div>
+        <div id="edit_client" style="display:none"></div>
         <div class="row">
           <div class="col-md-2 panel panel-heading pp">Contact Information</div>
         </div>
         
         <div class="row form-group">
-          <label class="col-md-1 control-label" for="name">Name</label>  
+          <label class="col-md-1 control-label" for="client_name">Name</label>  
           <div class="col-md-4">
             <div class="input-group">
               <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-              <input id="name" name="name" placeholder="" class="form-control input-md" type="text">
+              <input id="client_name" name="client_name" placeholder="" class="form-control input-md" type="text">
             </div>
           </div>
         </div>
@@ -78,7 +78,7 @@
           </div>
             
           <div class="col-md-1">
-            <a id="add_mobile" onclick=add_whatsapp()><i class="glyphicon glyphicon-plus"></i></a>
+            <a id="add_whatsapp" onclick=add_whatsapp()><i class="glyphicon glyphicon-plus"></i></a>
           </div>
           <div class="col-md-6" id="whatsapp_numbers"></div> 
         </div>
@@ -97,7 +97,7 @@
           </div>
             
           <div class="col-md-1">
-            <a id="add_mobile" onclick=add_landline()><i class="glyphicon glyphicon-plus"></i></a>
+            <a id="add_landline" onclick=add_landline()><i class="glyphicon glyphicon-plus"></i></a>
           </div>
           <div class="col-md-6" id="landline_numbers"></div>
         </div>
@@ -113,7 +113,7 @@
         <div class="row">
             <div class="col-md-2 panel panel-heading pp">Address Information</div>
         </div>  
-
+        <div id="address_error" class="text-center" style="color: red;"></div>
         <div class="row form-group">
           <label class="col-md-1 control-label" for="address_line1">Address Line 1</label>
           <div class="col-md-2">
@@ -139,7 +139,7 @@
 
           <label class="col-md-1 control-label" for="state">State</label>  
           <div class="col-md-2">
-            <input id="state" name="state" placeholder="" class="form-control input-md" type="text">
+            <input id="state" name="state" placeholder="" class="form-control input-md" required="" type="text">
           </div>
           
           <label class="col-md-1 control-label" for="country">Country</label>  
@@ -150,7 +150,7 @@
         
         <div class="form-group row">
           <div class="col-md-8 text-center">
-            <button id="save_client" class="btn btn-large btn-primary"> Save Client Information</button>
+            <input  type = "button" id="save_client" class="btn btn-large btn-primary" value="Save Client Information" /> 
             <button class="btn btn-large btn-danger" type="button" onclick=history.go(-1)> Cancel </button>
           </div>
         </div>
@@ -158,7 +158,9 @@
         </form>
       </div>
       <!-- <script src="{% static 'js/autocomplete.js' %}"></script> -->
+      <script src="{% static 'js/common.js' %}"></script>
       <script src="{% static 'js/create_client.js' %}"></script>
+      
       <script type="text/javascript">
         $(document).ready(function (){
           var availableTags = ["Andaman and Nicobar Islands","Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chandigarh","Chhattisgarh","Dadra and Nagar Haveli","Daman and Diu","Delhi","Goa","Gujarat","Haryana","Himachal Pradesh",
@@ -169,19 +171,28 @@
               source: availableTags
           });
 
-          $("#save_client").one('click',function(){
+          $("#save_client").click(function(){
             var mobileNumbers = get_mobile_info('mob');
             var whatsappNumbers = get_whatsapp_info("whatsapp");
             var landlineNumbers = get_landline_info("landline");
+            
+            var client_name = $("#client_name").val().trim();
+            
+            if (client_name == ''){
+                swal('Please enter Name ');
+                $("#client_name").focus();
+                return false;
+            }
+
             var mobile_no = $('#mobile').val().trim();
-            if (contactNumbers.length == 0 && validateMobileNumber(cleanMobileNumber(mobile_no))){
+            if (mobileNumbers.length == 0 && validateMobileNumber(cleanMobileNumber(mobile_no))){
                 if (confirm(mobile_no + " - Do you want to add this number and then Save ?")){
                     $("#add_mobile").click();
-                    contactNumbers = get_contact_info('mob');
+                    mobileNumbers = get_mobile_info('mob');
                 };
             };
 
-            if (contactNumbers.length == 0){
+            if (mobileNumbers.length == 0){
                 if (mobile_no == ""){
                     swal('Please enter at least 1 contact number');
                 }
@@ -191,109 +202,75 @@
                 $("#mobile").focus();
                 return false;
             }
+            
+            var whatsapp_no = $('#whatsapp').val().trim();
+            if (whatsappNumbers.length == 0 && validateMobileNumber(cleanMobileNumber(whatsapp_no))){
+                if (confirm(whatsapp_no + " - Do you want to add this number and then Save ?")){
+                    $("#add_whatsapp").click();
+                    whatsappNumbers = get_whatsapp_info('whatsapp');
+                };
+            };
 
-        //     var first_name = $("#first_name").val().trim();
-        //     var last_name = $("#last_name").val().trim();
-        //     if (first_name == '' && last_name == ''){
-        //         swal('Please enter First Name or Last Name');
-        //         $("#first_name").focus();
-        //         return false;
-        //     }
+            var landline_no = $('#landline').val().trim();
+            if (landlineNumbers.length == 0 && validateMobileNumber(cleanMobileNumber(landline_no))){
+                if (confirm(landline_no + " - Do you want to add this number and then Save ?")){
+                    $("#add_landline").click();
+                    landlineNumbers = get_landline_info('landline');
+                };
+            };
+            
+            var address_check = check_address_fields();
+            if (address_check == false){
+                return false;
+            }
 
-        //     var address_check = check_address_fields();
-        //     if (address_check == false){
-        //         swal('Please enter Address');
-        //         $("#village").focus();
-        //         return false;
-        //     }
+            json = ConvertFormToJSON("form");
+//            json["pin_code"] = $("#pin_code").val();
 
-        //     json = ConvertFormToJSON("form");
-        //     json["pin_code"] = $("#pin_code").val();
+            var contactInformation = {}
+            contactInformation['mobile'] = mobileNumbers;
+            contactInformation['whatsapp'] = whatsappNumbers;
+            contactInformation['landline'] = landlineNumbers;
+            json["contactInformation"] = contactInformation;
 
-        //     var contactLanguages = get_contact_info('lang');
-        //     var contactInformation = {}
-        //     contactInformation['numbers'] = contactNumbers;
-        //     json["contactInformation"] = contactInformation;
-
-        //     farmer_id = $("#edit_farmer").text();
-        //     if (farmer_id){
-        //         request_type = 'put';
-        //         json['farmer_id'] = farmer_id;
-        //     }
-        //     else {
-        //         request_type = 'post';
-        //     }
-        //     json['reference'] = $("#referer").val();
-
-        //     if($("#tractor").is(':checked')){
-        //       json['farmer_tractor'] = 1;
-        //     }
-        //     else{
-        //       json['farmer_tractor'] = 0;
-        //     }
-
-        //     if($("#crop_insurance").is(':checked')){
-        //       json['farmer_insurance'] = 1;
-        //     }
-        //     else{
-        //       json['farmer_insurance'] = 0;
-        //     }
-
-        //     if($("#drip_irrigation").is(':checked')){
-        //       json['farmer_irrigation'] = 1;
-        //     }
-        //     else{
-        //       json['farmer_irrigation'] = 0;
-        //     }
-
-        //     var crop_details=$("#crop_details").text();
-        //     if(crop_details!=''){
-        //       var crop_list=[];
-        //       var splited_detail= crop_details.split(',');
-        //       for(i=0;i<(splited_detail.length)-1;i++){
-        //         var cropInformation = {}
-        //         var seprate_crop_info = splited_detail[i].split(' ');
-        //         if(seprate_crop_info.length>0){
-        //           cropInformation['crop'] = seprate_crop_info[0];
-        //           cropInformation['season'] = seprate_crop_info[1];
-        //           cropInformation['farm_area'] = seprate_crop_info[2];
-        //           cropInformation['area_unit'] = seprate_crop_info[3];
-        //           cropInformation['crop_type'] = seprate_crop_info[4];
-        //           crop_list.push(cropInformation);
-        //         }
-               
-        //       }
-        //       json['crop_information'] = crop_list;
-        //     }
-        //     $.ajax(
-        //     {
-        //         url: "{{crm_service_url}}" + "farmerdetails/",
-        //         type: request_type,
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             'X-Authorization-Token':"{{request.session.userservice_key}}"
-        //         },
-        //         data: JSON.stringify(json),
-        //         success : function(data)
-        //         {
-        //             console.log(data);
-        //             if (data.responseData.farmer_id){
-        //               window.location = '/crm/farmer/view/' + data.responseData.farmer_id;
-        //             }
-        //             else {
-        //                 swal(data.responseData);
-        //             }
-        //         },
-        //         error : function(data)
-        //         {
-        //             alert("Something Went Wrong !");
-        //         },
-        //     });
-        //     return false;
-        // });
-
+            farmer_id = $("#edit_farmer").text();
+            if (farmer_id){
+                request_type = 'put';
+                json['farmer_id'] = farmer_id;
+            }
+            else {
+                request_type = 'post';
+            }
+        console.log(json);
+        console.log(request_type);
+            // $.ajax(
+            // {
+            //     url: "{{client_service_url}}" + "clientdetails/",
+            //     type: request_type,
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //         'X-Authorization-Token':"{{request.session.userservice_key}}"
+            //     },
+            //     data: JSON.stringify(json),
+            //     success : function(data)
+            //     {
+            //         console.log(data);
+            //         // if (data.responseData.farmer_id){
+            //         //   window.location = '/crm/farmer/view/' + data.responseData.farmer_id;
+            //         // }
+            //         // else {
+            //         //     swal(data.responseData);
+            //         // }
+            //     },
+            //     error : function(data)
+            //     {
+            //         alert("Something Went Wrong !");
+            //     },
+            // });
+            return false;
         });
 
-        
+      });
+      
       </script>
       {% endblock %}

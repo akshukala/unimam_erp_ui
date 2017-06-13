@@ -42,43 +42,45 @@ function cleanMobileNumber(field) {
 };
 
 function show_error(div_id, msg){
-    $("#" + div_id).text(msg).show().fadeOut(5000);
+    $("#" + div_id).text(msg).show();
 };
 
 
 function check_address_fields(){
+    
+    var address_line1 = $("#address_line1").val().trim();
+    if (address_line1 == ''){
+        $("#address_line1").focus();
+        show_error('address_error', 'Please Enter address_line1');
+        return false;
+    };
+
+    var area = $("#area").val().trim();
+    if (area == ''){
+        $("#area").focus();
+        show_error('address_error', 'Please Enter Area');
+        return false;
+    };
+
+    var city = $("#city").val().trim();
+    if (city == ''){
+        $("#city").focus();
+        show_error('address_error', 'Please Enter City');
+        return false;
+    };
+
+    var pin = $("#pin_code").val().trim();
+    if (pin == ''){
+        $("#pin_code").focus()
+        show_error('address_error', 'Please Enter Pin Code');
+        return false;
+    };
+    
     var state = $("#state").val().trim();
     if (state == ''){
-        $("#state").focus()
+        $("#state").focus();
         show_error('address_error', 'Please Enter State');
         return false;
     };
-
-    var district = $("#district").val().trim();
-    if (district == ''){
-        $("#district").focus()
-        show_error('address_error', 'Please Enter District');
-        return false;
-    };
-
-    var taluka = $("#taluka").val().trim();
-    if (taluka == ''){
-        $("#taluka").focus()
-        show_error('address_error', 'Please Enter Taluka');
-        return false;
-    };
-
-    var post_office = $("#post_office").val().trim();
-    if (post_office == ''){
-        $("#post_office").focus()
-        show_error('address_error', 'Please Enter Post Office');
-        return false;
-    };
-
-    var village = $("#village").val().trim();
-    if (village == ''){
-        $("#village").focus()
-        show_error('address_error', 'Please Enter Village');
-        return false;
-    };
+    
 };

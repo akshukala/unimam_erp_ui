@@ -118,3 +118,16 @@ function add_mobile(){
         function remove_pill(parent){
             $(parent).closest('.pill').remove();
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
