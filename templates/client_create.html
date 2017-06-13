@@ -1,0 +1,299 @@
+
+    {% extends 'base.html' %}
+    {% load staticfiles %}
+    {% block content %}
+    <style type="text/css">
+      form {
+          padding-left: 20px;
+          padding-right: 10px;
+      }
+      .row > label {
+        width:12%;
+      }
+      #mobile_numbers {
+          margin-left:120px;
+      }
+      #whatsapp_numbers {
+          margin-left:120px;
+      }
+      #landline_numbers {
+          margin-left:120px;
+      }
+      .pp {
+        color: #54cff8 !important;
+      }
+      #related_farmers{
+          overflow:hidden;
+          overflow-y:scroll;
+          height:170px;
+          font-size:13px;
+        }
+    </style>
+
+    <div class="container" style="margin-top:90px;">
+        <form class="form-horizontal" method="post" action="">
+        <fieldset>
+          {% csrf_token %}
+        <div id="edit_farmer" style="display:none"></div>
+        <div class="row">
+          <div class="col-md-2 panel panel-heading pp">Contact Information</div>
+        </div>
+        
+        <div class="row form-group">
+          <label class="col-md-1 control-label" for="name">Name</label>  
+          <div class="col-md-4">
+            <div class="input-group">
+              <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+              <input id="name" name="name" placeholder="" class="form-control input-md" type="text">
+            </div>
+          </div>
+        </div>
+
+        <div class="row form-group">
+          <label class="col-md-2 control-label" for="mobile">Mobile No.</label>
+          <div class="col-md-3">
+            <div class="input-group">
+              <span class="input-group-addon"><i class="glyphicon glyphicon-phone"></i></span>
+              <input id="mobile" maxlength="10" name="mobile" placeholder="xxxxxxxxxxxx" class="form-control input-md ac_mobile" type="number" value={{mobile}}>
+            </div>
+          </div>
+            
+          <div class="col-md-1">
+            <a id="add_mobile" onclick=add_mobile()><i class="glyphicon glyphicon-plus"></i></a>
+          </div>  
+          <div class="col-md-6" id="mobile_numbers"></div>
+        </div>
+        
+        <!-- <div class="row form-group">
+          
+        </div> -->
+
+        <div class="row form-group">
+          <label class="col-md-2 control-label" for="whatsapp">Whatsapp No.</label>
+          <div class="col-md-3">
+            <div class="input-group">
+              <span class="input-group-addon"><i class="glyphicon glyphicon-phone"></i></span>
+              <input id="whatsapp" maxlength="10" name="whatsapp" placeholder="xxxxxxxxxxxx" class="form-control input-md ac_mobile" type="number" value={{mobile}}>
+            </div>
+          </div>
+            
+          <div class="col-md-1">
+            <a id="add_mobile" onclick=add_whatsapp()><i class="glyphicon glyphicon-plus"></i></a>
+          </div>
+          <div class="col-md-6" id="whatsapp_numbers"></div> 
+        </div>
+
+        <!-- <div class="row form-group">
+          
+        </div> -->
+
+        <div class="row form-group">
+          <label class="col-md-2 control-label" for="landline">Landline No.</label>
+          <div class="col-md-3">
+            <div class="input-group">
+              <span class="input-group-addon"><i class="glyphicon glyphicon-phone"></i></span>
+              <input id="landline" maxlength="11" name="landline" placeholder="xxxxxxxxxxxxx" class="form-control input-md ac_mobile" type="number" value={{mobile}}>
+            </div>
+          </div>
+            
+          <div class="col-md-1">
+            <a id="add_mobile" onclick=add_landline()><i class="glyphicon glyphicon-plus"></i></a>
+          </div>
+          <div class="col-md-6" id="landline_numbers"></div>
+        </div>
+
+        <!-- <div class="row form-group">
+          
+        </div> -->
+
+        
+        
+        
+
+        <div class="row">
+            <div class="col-md-2 panel panel-heading pp">Address Information</div>
+        </div>  
+
+        <div class="row form-group">
+          <label class="col-md-1 control-label" for="address_line1">Address Line 1</label>
+          <div class="col-md-2">
+            <textarea class="form-control" rows="2" cols="15" id="address_line1" name="address_line1" placeholder="Addess Details..."></textarea>
+          </div>
+
+          <label class="col-md-1 control-label" for="area">Area</label>
+          <div class="col-md-2">
+            <input id="area" name="area" placeholder="" class="form-control input-md" required="" type="text">
+          </div>
+
+          <label class="col-md-1 control-label" for="city">City</label>  
+          <div class="col-md-2">
+            <input id="city" name="city" placeholder="" class="form-control input-md" required="" type="text">
+          </div>
+        </div>
+
+        <div class="row form-group">
+          <label class="col-md-1 control-label" for="pin_code">Pin Code</label>  
+          <div class="col-md-2">
+            <input id="pin_code" name="pin_code" placeholder="" class="form-control input-md" required="" type="text">
+          </div>
+
+          <label class="col-md-1 control-label" for="state">State</label>  
+          <div class="col-md-2">
+            <input id="state" name="state" placeholder="" class="form-control input-md" type="text">
+          </div>
+          
+          <label class="col-md-1 control-label" for="country">Country</label>  
+          <div class="col-md-2">
+            <input id="country" name="country" placeholder="" disabled="true" class="form-control input-md" value="India" type="text">
+          </div>
+        </div>
+        
+        <div class="form-group row">
+          <div class="col-md-8 text-center">
+            <button id="save_client" class="btn btn-large btn-primary"> Save Client Information</button>
+            <button class="btn btn-large btn-danger" type="button" onclick=history.go(-1)> Cancel </button>
+          </div>
+        </div>
+        </fieldset>
+        </form>
+      </div>
+      <!-- <script src="{% static 'js/autocomplete.js' %}"></script> -->
+      <script src="{% static 'js/create_client.js' %}"></script>
+      <script type="text/javascript">
+        $(document).ready(function (){
+          var availableTags = ["Andaman and Nicobar Islands","Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chandigarh","Chhattisgarh","Dadra and Nagar Haveli","Daman and Diu","Delhi","Goa","Gujarat","Haryana","Himachal Pradesh",
+            "Jammu and Kashmir","Jharkhand","Karnataka","Kerala","Lakshadweep","Madhya Pradesh","Maharashtra","Manipur",
+            "Meghalaya","Mizoram","Nagaland","Odisha","Puducherry","Punjab","Rajasthan","Sikkim","Tamil Nadu","Tripura",
+            "Uttar Pradesh","Uttarakhand","West Bengal"];
+          $( "#state" ).autocomplete({
+              source: availableTags
+          });
+
+          $("#save_client").one('click',function(){
+            var mobileNumbers = get_mobile_info('mob');
+            var whatsappNumbers = get_whatsapp_info("whatsapp");
+            var landlineNumbers = get_landline_info("landline");
+            var mobile_no = $('#mobile').val().trim();
+            if (contactNumbers.length == 0 && validateMobileNumber(cleanMobileNumber(mobile_no))){
+                if (confirm(mobile_no + " - Do you want to add this number and then Save ?")){
+                    $("#add_mobile").click();
+                    contactNumbers = get_contact_info('mob');
+                };
+            };
+
+            if (contactNumbers.length == 0){
+                if (mobile_no == ""){
+                    swal('Please enter at least 1 contact number');
+                }
+                else{
+                    swal("Please enter valid number")
+                }
+                $("#mobile").focus();
+                return false;
+            }
+
+        //     var first_name = $("#first_name").val().trim();
+        //     var last_name = $("#last_name").val().trim();
+        //     if (first_name == '' && last_name == ''){
+        //         swal('Please enter First Name or Last Name');
+        //         $("#first_name").focus();
+        //         return false;
+        //     }
+
+        //     var address_check = check_address_fields();
+        //     if (address_check == false){
+        //         swal('Please enter Address');
+        //         $("#village").focus();
+        //         return false;
+        //     }
+
+        //     json = ConvertFormToJSON("form");
+        //     json["pin_code"] = $("#pin_code").val();
+
+        //     var contactLanguages = get_contact_info('lang');
+        //     var contactInformation = {}
+        //     contactInformation['numbers'] = contactNumbers;
+        //     json["contactInformation"] = contactInformation;
+
+        //     farmer_id = $("#edit_farmer").text();
+        //     if (farmer_id){
+        //         request_type = 'put';
+        //         json['farmer_id'] = farmer_id;
+        //     }
+        //     else {
+        //         request_type = 'post';
+        //     }
+        //     json['reference'] = $("#referer").val();
+
+        //     if($("#tractor").is(':checked')){
+        //       json['farmer_tractor'] = 1;
+        //     }
+        //     else{
+        //       json['farmer_tractor'] = 0;
+        //     }
+
+        //     if($("#crop_insurance").is(':checked')){
+        //       json['farmer_insurance'] = 1;
+        //     }
+        //     else{
+        //       json['farmer_insurance'] = 0;
+        //     }
+
+        //     if($("#drip_irrigation").is(':checked')){
+        //       json['farmer_irrigation'] = 1;
+        //     }
+        //     else{
+        //       json['farmer_irrigation'] = 0;
+        //     }
+
+        //     var crop_details=$("#crop_details").text();
+        //     if(crop_details!=''){
+        //       var crop_list=[];
+        //       var splited_detail= crop_details.split(',');
+        //       for(i=0;i<(splited_detail.length)-1;i++){
+        //         var cropInformation = {}
+        //         var seprate_crop_info = splited_detail[i].split(' ');
+        //         if(seprate_crop_info.length>0){
+        //           cropInformation['crop'] = seprate_crop_info[0];
+        //           cropInformation['season'] = seprate_crop_info[1];
+        //           cropInformation['farm_area'] = seprate_crop_info[2];
+        //           cropInformation['area_unit'] = seprate_crop_info[3];
+        //           cropInformation['crop_type'] = seprate_crop_info[4];
+        //           crop_list.push(cropInformation);
+        //         }
+               
+        //       }
+        //       json['crop_information'] = crop_list;
+        //     }
+        //     $.ajax(
+        //     {
+        //         url: "{{crm_service_url}}" + "farmerdetails/",
+        //         type: request_type,
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'X-Authorization-Token':"{{request.session.userservice_key}}"
+        //         },
+        //         data: JSON.stringify(json),
+        //         success : function(data)
+        //         {
+        //             console.log(data);
+        //             if (data.responseData.farmer_id){
+        //               window.location = '/crm/farmer/view/' + data.responseData.farmer_id;
+        //             }
+        //             else {
+        //                 swal(data.responseData);
+        //             }
+        //         },
+        //         error : function(data)
+        //         {
+        //             alert("Something Went Wrong !");
+        //         },
+        //     });
+        //     return false;
+        // });
+
+        });
+
+        
+      </script>
+      {% endblock %}

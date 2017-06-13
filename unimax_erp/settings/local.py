@@ -8,6 +8,7 @@ from unimax_erp.settings.base import *
 # ADS_SERVICE_URL = 'http://0.0.0.0:9866/adsservice/'
 # ADMIN_SERVICE_URL = 'http://0.0.0.0:9864/adminservice/'
 USER_SERVICE_URL = 'http://0.0.0.0:7281/userservice/'
+CLIENT_SERVICE_URL = 'http://0.0.0.0:7283/clientservice/'
 
 NPS_URL = "http://127.0.0.1:8000/"
 UNI_HOST = "http://127.0.0.1:8000/"
