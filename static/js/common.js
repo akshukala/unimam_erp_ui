@@ -22,6 +22,13 @@ function validateMobileNumber(field) {
     return false;
 };
 
+function validateLandlineNumber(field) {
+    if (field.match(/^\d{11}$/)) {
+        return true;
+    };
+    return false;
+};
+
 function cleanName(name){
     cleanedName = name.replace(/[^a-zA-Z]/g, '');
     if (cleanedName.length > 2){
@@ -75,7 +82,7 @@ function check_address_fields(){
         show_error('address_error', 'Please Enter Pin Code');
         return false;
     };
-    
+
     var state = $("#state").val().trim();
     if (state == ''){
         $("#state").focus();

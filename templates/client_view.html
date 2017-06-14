@@ -1,0 +1,733 @@
+    {% extends 'base.html' %}
+    {% load staticfiles %}
+    {% block content %}
+    <style type="text/css">
+        button {
+          text-align:center;
+        }
+        table {
+          font-size:13px;
+        }
+        .table-striped-column > tbody > tr td:nth-of-type(odd) {
+          background-color: #E9F0E9;
+        }
+        .table-striped-column td:nth-child(odd) {
+          background-color: #E9F0E9;
+        }
+        #order_history {
+          display:none;
+          table-layout: fixed;
+        }
+        #order_history td:nth-child(3){
+          width: 100px;
+        }
+        #order_history td:nth-child(4){
+          width: 100px;
+        }
+        #order_history td:nth-child(9){
+          width: 100px;
+        }
+        #order_history td:nth-child(10){
+          width: 100px;
+        }
+        .pill {
+          display:inline-block;
+          margin:5px 5px 5px 7px;
+          padding:2px 10px;
+          border-radius:4px;
+          cursor: default;
+          border:1px solid transparent;
+        }
+        .pill a {
+          padding:5px 5px;
+        }
+        a:hover {
+          cursor:pointer;
+        }
+        hr {
+          margin:7px
+        }
+        #comments{
+          overflow:hidden;
+          overflow-y:scroll;
+          height:180px;
+          font-size:13px;
+        }
+        /*#related_farmers{
+          overflow:hidden;
+          overflow-y:scroll;
+          height:170px;
+          font-size:13px;
+        }*/
+        #table-scroll {
+        height:200px;
+        overflow:auto;  
+        margin-top:20px;
+        }
+        /*.well{
+        margin-left: 15px;
+          border: 2px dashed #C0C0C0;
+        }
+        .coupon {
+        position: relative;
+        width: 200px;
+        height: auto;
+        border-radius: 10px;
+        border: 2px dashed  #fa5b7d;
+        background-color: pink;
+
+        .coupon__tag {
+          position: absolute;
+          left: -27%;
+          bottom: 45%;
+          width: 70%;
+          transform: rotate(-90deg);
+          -ms-transform: rotate(-90deg);
+          -webkit-transform: rotate(-90deg);
+          font-size: 0.65em;
+          text-align: center;
+          font-family: Helvetica;
+          color: #fa5b7d;
+        }
+       
+       .coupon__body {
+          margin-left: 30px;
+          padding: 10px;
+          border-left: 1px dotted #fa5b7d;
+          
+          .coupon__title, .coupon__value {
+            text-align: center;
+          }
+          
+       .coupon__title {
+          font-family: Helvetica;
+          font-size: 1em;
+          text-shadow: 1px 1px 0 white;
+          color: #fa5b7d;
+        }
+      }
+    }*/
+    </style>
+
+		
+
+    <div class="container" style="margin-top:90px;">
+      <h4 id="error" style="display:none"> No farmer found for this id </h4>
+      <div class="row" id="info">
+        <div class="col-md-8">
+          <button class="btn btn-warning" onclick=editClient()><span class="glyphicon glyphicon-edit"></span>Edit Information </button>
+          <button class="btn btn-success" onclick=createOrder()><span class="glyphicon glyphicon-shopping-cart"></span>Create Order </button>
+          <button id="addCall" class="btn btn-primary" data-toggle="modal" data-target="#myModal"><span class="glyphicon glyphicon-earphone"></span>Add a Call </button>
+          <button id="addCall" class="btn btn-info" data-toggle="modal" data-target="#schedule_modal"><span class="glyphicon glyphicon-calendar"></span>Schedule Call </button>
+          <button id="bankDetails" class="btn btn-danger"><span class="glyphicon glyphicon-book"></span>Send Bank Details</button><br><hr>
+          <span class="col-md-4"> Name </span>
+          <span class="col-md-8" id="name"></span><br><hr>
+          <span class="col-md-4"> Mobile Numbers </span>
+          <span class="col-md-8" id=mobile_no></span><br><hr>
+          <span class="col-md-4"> Whatsapp Numbers </span>
+          <span class="col-md-8" id=whatsapp_no></span><br><hr>
+          <span class="col-md-4"> Landline Numbers </span>
+          <span class="col-md-8" id=landline_no></span><br><hr>
+          <!-- <span class="col-md-4"> Description </span>
+          <span class="col-md-8" id="description"> </span><br><hr> -->
+          <span class="col-md-4"> Created  By - Created On </span>
+          <span class="col-md-8" id="createdBy_createdOn"> </span><br><hr>
+          <span class="col-md-4"> Modified By - Modified On </span>
+          <span class="col-md-8" id="modifiedBy_modifiedOn"> </span><br><hr>
+          <span class="col-md-4"> Billing Address </span>
+          <span class="col-md-8" id="billing_address"> </span><br><hr>
+          <!-- <span class="col-md-4">More Details</span>
+          <span class="col-md-8" id="more_details"></span> -->
+        </div>
+        <div class="col-md-4">
+          <div class="col-md-12" id="comments"></div>
+          <div class="col-md-12" id="new_comment"></div>
+        </div>
+      </div>
+      <!-- <div class="row panel-heading">
+        <div class="col-md-8" id="coupon_div"></div>
+        <div class="col-md-4"><div class="col-md-12" id="related_farmers"></div></div>
+      </div> -->
+      <div class="col-md-12 row panel-heading"><b> Order History <span id="order_count"></span> </b></div>
+      <div class="col-md-12">
+        <div id="no_orders"> <h3>No Past Orders Found </h3></div>
+          <table id="order_history" class="table table-bordered text-center vcenter">
+            <thead>
+              <tr style="background-color: silver;">
+                <td> Order No</td>
+                <td> Created By </td>
+                <td> Created On </td>
+                <td> Total Discount </td>
+                <td> Grand Total </td>
+                <td> Advance Payment </td>
+                <td> COD Amount </td>
+                <td> Order Status </td>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="col-md-12 row panel-heading"><b> Call History <span id="call_count"></span> </b></div>
+        <div class="col-md-12">
+          <div id="no_calls"> <h3>No Past Calls Found </h3></div>
+          <table id="call_history" class="table table-bordered text-center vcenter">
+            <thead>
+              <tr style="background-color: silver;">
+                <td>Sr.No</td>
+                <td>Created On</td>
+                <td>Created By</td>
+                <td>Tags</td>
+              </tr>
+            </thead>
+            <tbody id="call_history_body">
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!--Tag Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog modal-lg">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Tags</h4>
+      </div>
+      <div class="modal-body">
+        <div id="table-scroll">
+      <table id="tag_table" class="table table-striped  text-center table-responsive">
+        <thead>
+                <tr style="color: #000; background: #C0C0C0;">
+                    <td> No</td>
+                    <td> Tag Name </td>
+                    <td> Add Tag</td>
+                    <td> Remove Tag</td>
+                </tr>
+          </thead>
+          <tbody id="tag_body">
+          
+          </tbody>
+      </table>
+    </div>
+    <div> 
+      <textarea id="selected_tags" rows="6" cols="30" readonly></textarea>
+    </div>
+    <button type="button" id="mark_tags" class="btn btn-primary">Mark Tags</button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!--Modal end-->
+<!-- Schedule Modal -->
+  <div class="modal fade" id="schedule_modal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Schedule a Call</h4>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+        <div class="col-md-8">
+          <div class="form-group form-inline">
+            <label>Mobile No:</label>
+            <input type="text" class="form-control" id="schedule_mobile_no">
+          </div>
+        </div>
+      </div>
+            <div class="row">
+        <div class="col-md-10">
+          <div class="form-group form-inline">
+            <label>Schedule Date:</label>
+            <div class='input-group date' data-date-format="yyyy-mm-dd hh:ii:ss" id='datetimepicker1'>
+                        <input type='text' class="form-control" id="schedule_dt" />
+                          <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                          </span>
+                    </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-8">
+          <div class="form-group form-inline">
+            <label>Note:</label>
+            <textarea class="form-control" id="note"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2" id="product_div">
+          <button id="schedule_btn" class="btn btn-primary">Schedule</button>
+        </div>
+      </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+<!--Modal end--> 
+
+  <script type="text/javascript">
+
+        $(document).ready(function(){
+          $('#datetimepicker1').datetimepicker({}); 
+          var currentUrl = window.location.href;
+          url_id = currentUrl.split('/view/')
+          $("#info .btn").hide();
+          if (url_id[1] == ""){
+            $("#error").show();
+            $("#info").hide();
+          }
+          $.ajax(
+            {
+                url: "{{client_service_url}}" + "clientdetails/",
+                headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}"},
+                type: 'get',
+                dataType: 'json',
+                data : {"client_id": url_id[1]},
+                success : function(data)
+                {
+                    if (data.responseData == "ClientNotFound"){
+                        $("#error").show();
+                        $("#info").hide();
+                    };
+                    console.log(data);
+                    populate_info(data.responseData);
+                },
+                error : function(data)
+                {
+                    alert("Error in Getting Farmer Information");
+                },
+          });
+
+          $("#addCall").click(function(){
+              $.ajax(
+                {
+                    url: "{{client_service_url}}" + "tags/",
+                    headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}"},
+                    type: 'get',
+                    dataType: 'json',
+                    success : function(data)
+                    {
+                        console.log(data);
+                        populate_tags(data['responseData']);
+                    },
+                    error : function(data)
+                    {
+                        alert("Error in Getting Farmer Information");
+                    },
+                });
+            });
+
+          $("#mark_tags").one('click',function(){
+              var all_tags=[];
+              var unique_tags = [];
+              var all_unique_tags =[];
+              var count=0;
+              var tags = $("#selected_tags").val();
+              if(tags==''){
+                swal("Please Select atleast one tag");
+                return false;
+              }
+              var client_id=url_id[1];
+              tags=tags.split('\n');
+              // Getting all tags array.
+              for(i=0;i<(tags.length)-1;i++){
+                all_tags[i] = tags[i];
+              }
+              // Getting distinct tag array
+              $.each(all_tags, function(i, e) {
+                  if ($.inArray(e, unique_tags) == -1) unique_tags.push(e);
+              });
+              // Removing blank tags when tag added after removing one tag
+              for(i=0;i<unique_tags.length;i++){
+                if(unique_tags[i]!=''){
+                  all_unique_tags[count]=unique_tags[i];
+                  count++;
+                }
+              }
+              
+              $.ajax(
+                      {
+                            type: 'post',
+                            url: "{{client_service_url}}"+"tags/",
+                            headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}"},
+                            dataType: 'json',
+                            data: JSON.stringify({
+                                                    'client_id': client_id,
+                                                    'tags': all_unique_tags   
+                                                    }),
+                            success : function(result)
+                            {
+                              
+                              swal({
+                                title: "Success!!!",
+                                text: result['responseData'],
+                                type: "success",
+                               },
+                              function(){
+                                location.reload();
+                              });
+                            },
+                            error : function(error)
+                            {
+                                window.alert(error);
+                            },
+                        });
+
+            });
+
+            $("#schedule_btn").one('click',function(){
+            var mobile_no= "+91"+$("#schedule_mobile_no").val().trim();
+            var schedule_dt = $("#schedule_dt").val();
+            var note = $("#note").val().trim();
+            var client_id=url_id[1];
+            $.ajax(
+                    {
+                      type: 'post',
+                      url: "{{client_service_url}}"+"scheduleCalls/",
+                      headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}"},
+                      dataType: 'json',
+                      data: JSON.stringify({
+                                            'mobile_no': mobile_no,
+                                            'schedule_date': schedule_dt,
+                                            'note': note
+                                          }),
+                      success : function(result)
+                              {
+                                
+                                console.log(result['responseData']);
+                                if(result['responseData']['responseCode']=="200"){
+                                  swal({
+                                    title: "Success!!!",
+                                    text: result['responseData']['Message'],
+                                    type: "success",
+                                  },
+                                  function(){
+                                    location.reload();
+                                  });
+                                }
+                                else{
+                                      swal({
+                                        title: "Error!!!",
+                                        text: result['responseData']['Message'],
+                                        type: "warning",
+                                       },
+                                      function(){
+                                        location.reload();
+                                      });
+                                }
+                              },
+                      error : function(error)
+                            {
+                              window.alert(error);
+                            },
+              });
+            });
+
+            $("#bankDetails").one('click',function(){
+              swal({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                type: 'info',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Send it!',
+                cancelButtonText: 'No',
+                closeOnConfirm: true
+              }, function() {
+                $.ajax(
+                  {
+                    type:'get',
+                    url: "{{client_service_url}}"+"bank_details/?client_id="+url_id[1],
+                    headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}",
+                                'content_type':'application/json'},
+                    dataType: 'json',
+                    success : function(data)
+                          {
+                            console.log(data);
+                            if(data['responseData']){
+                              result = data['responseData'];
+                              }
+                          else{
+                                  result = data;  
+                              }
+                            swal({
+                                  title: 'Message',
+                                  text: result['Message']
+                                  },function(){
+                                      location.reload();
+                                  });
+                          },
+                    error : function(error)
+                      {
+                          window.alert(error['responseText'])
+                      }
+                  });
+              });
+            });
+
+          function populate_info(info){
+            $("#info .btn").show();
+            $("#name").text(info.client_name);
+            $("#createdBy_createdOn").text(info.created_by + ' - ' + info.created_on);
+            $("#modifiedBy_modifiedOn").text(info.modified_by + ' - ' + info.last_modified);
+            var bajson = info.billing_address[0];
+            $("#billing_address").html(bajson.address_line1 + ', ' +bajson.area + ', ' + bajson.city +'-' + bajson.pin_code+ ' ' + bajson.state);
+            $("#schedule_mobile_no").val(info.mobile[0]);
+
+            var mobile_string = "";
+            if(info.mobile != "Not Available"){
+              for(i=0;i<info.mobile.length;i++){
+                mobile_string += info.mobile[i] + " | ";
+              }
+            }
+            else{
+              mobile_string = info.mobile;
+            }
+            $("#mobile_no").text(mobile_string);
+            
+            var whatsapp_string = "";
+            if(info.whatsapp != "Not Available"){
+              for(i=0;i<info.whatsapp.length;i++){
+                whatsapp_string += info.whatsapp[i] + " | ";
+              }
+            }
+            else{
+              whatsapp_string = info.whatsapp;
+            }
+            $("#whatsapp_no").text(whatsapp_string);
+
+            var landline_string = "";
+            if(info.landline != "Not Available"){
+              for(i=0;i<info.landline.length;i++){
+                landline_string += info.landline[i] + " | ";
+              }
+            }
+            else{
+              landline_string = info.landline;
+            }
+            $("#landline_no").text(landline_string);
+            
+            var comments = "<h5>Comments</h5>"
+            $.each(info.comments, function(index, com){
+                comments += "<div class=col-md-12 style=margin-top:5px>";
+                comments += "<span class=col-md-6 style=color:green>" + com.commented_by + "</span>";
+                comments += "<span class=col-md-6>" + com.comment_time + "</span>";
+                comments += "<span class=col-md-12>" + com.comment + "</span>";
+                comments += "</div>";
+            });
+            $("#comments").html(comments);
+            var new_comment = "<h5>Add new comment</h5>";
+            new_comment += "<div class='input-group'><span class='input-group-addon'><i class='glyphicon glyphicon-edit'></i></span><textarea class='form-control' id=new_comment_text ></textarea></div>";
+            new_comment += " <input class='btn-block btn btn-success' onclick=submitComment() value=Submit></input>";
+            $("#new_comment").html(new_comment);
+
+            // var related_data = "<h5>Extra Information</h5>";
+            // if(info.related_data.farmer && info.related_data.order){
+            //   if(info.related_data.order.length==0){
+            //     related_data +="<hr>No orders at this Post Office.";
+            //   }else{
+            //     $.each(info.related_data.order, function(index, rel_data){
+            //         console.log(rel_data.order_id);
+            //         related_data +="<p><a href='/crm/salesorder/view/"+rel_data.order_id+"' target='_blank'>"+rel_data.name+"</a>&emsp;"+rel_data.status +"<button class='btn btn-default btn-xs' data-toggle='tooltip' data-placement='bottom' title='"+rel_data.order_item+"'><span class='glyphicon glyphicon-comment'></span></button></p>";
+            //     });
+            //   }
+            //   $.each(info.related_data.farmer, function(index, rel_data){
+            //         related_data +="<p><a href='/crm/farmer/view/"+rel_data.farmer_id+"' target='_blank'>"+rel_data.name+"</a></p>";
+            //   });
+            // }
+            // else{
+            //   $.each(info.related_data.order, function(index, rel_data){
+            //         related_data +="<p><a href='/crm/salesorder/view/"+rel_data.order_id+"' target='_blank'>"+rel_data.name+"</a>&emsp;"+rel_data.status+"<button class='btn btn-default btn-xs' data-toggle='tooltip' data-placement='bottom' title='"+rel_data.order_item+"'><span class='glyphicon glyphicon-comment'></span></button></p>";
+            //   });
+            // }
+            // $("#related_farmers").html(related_data);
+            
+            // if (info.orders.length > 0){
+            //     $("#no_orders").hide();
+            //     $("#order_history").show();
+            //     $.each(info.orders, function(index, order){
+            //         var order_row = "<tr>";
+            //         order_row += "<td><a href=/crm/salesorder/view/" + order.sales_order_id + ">" + order.sales_order_id + "</a></td>";
+            //         order_row += "<td>" + ( order.entered_by || '' ) + "</td>";
+            //         order_row += "<td>" + order.created_on + "</td>";
+            //         order_row += "<td>" + order.total_discount + "</td>";
+            //         order_row += "<td>" + order.grand_total + "</td>";
+            //         order_row += "<td>" + order.advance_payment + "</td>";
+            //         order_row += "<td>" + order.cod_amount + "</td>";
+            //         order_row += "<td>" + order.status + "</td>";
+            //         order_row += "</tr>";
+            //         $("#order_history > tbody").append(order_row);
+            //     });
+            //     $("#order_count").html(" ( Total : " + info.order_count + ", Last Order : " + info.last_active + ")");
+            //     $("#order_history").DataTable({
+            //         "order": [[ 0, "desc" ]],
+            //         "autoWidth": false
+            //     });
+            // };
+            populate_call_history(info.call_history);
+          }
+        function populate_call_history(data){
+          
+          if(data.length >0 ){
+            $("#no_calls").hide();
+            for(var i=0; i< data.length; i++){
+              var sr_no=document.createTextNode(i+1);
+              var created_on = document.createTextNode(data[i]['created_date']);
+              var created_by = document.createTextNode(data[i]['created_by']);
+              var combined_tags='';
+              count = data[i]['tags'].length;
+              for(var j=0;j< count;j++){
+                combined_tags += ""+data[i]['tags'][j] +', ';
+              }
+              var tag = document.createTextNode(combined_tags);
+
+              tabBody=document.getElementById('call_history_body');
+                 row=document.createElement("tr");
+                 row.setAttribute("id",i);
+                 cell1 = document.createElement("td");
+                 cell2 = document.createElement("td");
+                 cell3 = document.createElement("td");
+                 cell4 = document.createElement("td");
+
+                 cell1.appendChild(sr_no);
+                 cell2.appendChild(created_on);
+                 cell3.appendChild(created_by);
+                 cell4.appendChild(tag);
+
+                 row.appendChild(cell1);
+                 row.appendChild(cell2);
+                 row.appendChild(cell3);
+                 row.appendChild(cell4);
+                 tabBody.appendChild(row);
+                 
+            } 
+            $("#call_count").html("( Total : "+ data.length + ")");
+                 $("#call_history").DataTable({
+                    "call": [[ 0, "desc" ]],
+                    "autoWidth": false
+                });
+          }
+          else{
+            $("#no_calls").show();
+            $("#call_history").hide();
+          }
+
+        }
+
+        function populate_tags(result){
+          var modal_body_id = document.getElementById('tag_body');
+          DeleteRows();
+          for(var i =0; i< result.length; i++){
+            
+            sr_no = document.createTextNode(i+1);
+            tag_name = document.createTextNode(result[i]['tag_name']);
+              
+            add_button = document.createElement("BUTTON");
+            add_button.setAttribute('class','btn btn-success btn-number');
+            add_button.setAttribute('id','b'+result[i]['id']);
+            span_element = document.createElement("SPAN");
+            span_element.setAttribute('class','glyphicon glyphicon-plus');
+            add_button.appendChild(span_element);
+
+            remove_button = document.createElement("BUTTON");
+            remove_button.setAttribute('id','c'+result[i]['id']);
+            remove_button.setAttribute('class','btn btn-danger btn-number');
+            remove_span_element= document.createElement("SPAN");
+            remove_span_element.setAttribute('class','glyphicon glyphicon-minus');
+            remove_button.appendChild(remove_span_element);
+
+            tabBody=document.getElementById("tag_body");
+               row=document.createElement("tr");
+               row.setAttribute("id",result[i]['id']);
+               cell1 = document.createElement("td");
+               cell2 = document.createElement("td");
+               cell2.setAttribute('class','nr');
+               cell4 = document.createElement("td");
+               cell5 = document.createElement("td");
+
+               cell1.appendChild(sr_no);
+               cell2.appendChild(tag_name);
+               cell4.appendChild(add_button);
+               cell5.appendChild(remove_button);
+
+               row.appendChild(cell1);
+               row.appendChild(cell2);
+               row.appendChild(cell4);
+               row.appendChild(cell5);
+               tabBody.appendChild(row);
+               
+               add_button.onclick = function(){
+                  selected_tag_name = $(this).closest("tr").find(".nr").text();
+                  var current_val= $("#selected_tags").val();
+                  var actual_val= current_val+selected_tag_name;
+                  $("#selected_tags").val(actual_val+'\n');
+               }
+
+               remove_button.onclick = function(){
+                 rm_tag_name = $(this).closest("tr").find(".nr").text();
+                 val = $("#selected_tags").val();
+                 $("#selected_tags").val(val.replace(rm_tag_name,''));
+
+               }
+          }
+        }
+
+        function DeleteRows() {
+          var rowCount = tag_table.rows.length;
+          for (var i = rowCount - 1; i > 0; i--) {
+            tag_table.deleteRow(i);
+          }
+        }
+
+      });
+
+      function editClient(){
+            var currentUrl = window.location.href;
+            window.location = currentUrl.replace('/view/', '/edit/')
+        };
+
+      function submitComment(){
+            var comment_str = $("#new_comment_text").val().trim();
+            if (comment_str == ''){
+                alert("Please write comment first");
+                return false;
+            }
+            $.ajax(
+            {
+                url: "{{client_service_url}}" + "clientcomments/",
+                headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}"},
+                type: 'post',
+                dataType: 'json',
+                data : JSON.stringify({
+                    "client_id": url_id[1],
+                    "comment": comment_str
+                    }),
+                success : function(data)
+                {
+                    window.location.reload();
+                },
+                error : function(data)
+                {
+                    alert("Error in posting comment");
+                },
+            });
+        };
+    </script>
+  {% endblock %}

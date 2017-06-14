@@ -54,7 +54,7 @@
           <div class="col-md-3">
             <div class="input-group">
               <span class="input-group-addon"><i class="glyphicon glyphicon-phone"></i></span>
-              <input id="mobile" maxlength="10" name="mobile" placeholder="xxxxxxxxxxxx" class="form-control input-md ac_mobile" type="number" value={{mobile}}>
+              <input id="mobile" maxlength="10" name="mobile" placeholder="xxxxxxxxxxxx" class="form-control input-md" type="number" value={{mobile}}>
             </div>
           </div>
             
@@ -73,7 +73,7 @@
           <div class="col-md-3">
             <div class="input-group">
               <span class="input-group-addon"><i class="glyphicon glyphicon-phone"></i></span>
-              <input id="whatsapp" maxlength="10" name="whatsapp" placeholder="xxxxxxxxxxxx" class="form-control input-md ac_mobile" type="number" value={{mobile}}>
+              <input id="whatsapp" maxlength="10" name="whatsapp" placeholder="xxxxxxxxxxxx" class="form-control input-md" type="number" value={{mobile}}>
             </div>
           </div>
             
@@ -92,7 +92,7 @@
           <div class="col-md-3">
             <div class="input-group">
               <span class="input-group-addon"><i class="glyphicon glyphicon-phone"></i></span>
-              <input id="landline" maxlength="11" name="landline" placeholder="xxxxxxxxxxxxx" class="form-control input-md ac_mobile" type="number" value={{mobile}}>
+              <input id="landline" maxlength="11" name="landline" placeholder="xxxxxxxxxxxxx" class="form-control input-md" type="number" value={{mobile}}>
             </div>
           </div>
             
@@ -129,7 +129,7 @@
         <div class="row form-group">
           <label class="col-md-1 control-label" for="pin_code">Pin Code</label>  
           <div class="col-md-2">
-            <input id="pin_code" name="pin_code" placeholder="" class="form-control input-md" required="" type="text">
+            <input id="pin_code" name="pin_code" placeholder="" class="form-control input-md" required="" maxlength="6" type="number">
           </div>
 
           <label class="col-md-1 control-label" for="state">State</label>  
@@ -165,6 +165,34 @@
           $( "#state" ).autocomplete({
               source: availableTags
           });
+
+          var currentUrl = window.location.href;
+          url_id = currentUrl.split('/edit/');
+
+          if (url_id.length > 1 && url_id[1] != ""){
+                $("#edit_client").text(url_id[1]);
+                $.ajax(
+                {
+                    url: "{{client_service_url}}" + "clientdetails/",
+                    headers: {'X-Authorization-Token':"{{request.session.userservice_key}}"},
+                    type: 'get',
+                    dataType: 'json',
+                    data : {"client_id": url_id[1]},
+                    success : function(data)
+                    {
+                        console.log(data);
+                        if (data.responseData == "ClientNotFound"){
+                            swal("Client Not Found");
+                            window.location = '/erp/client/search/';
+                        }
+                        populate_info(data.responseData);
+                    },
+                    error : function(data)
+                    {
+                        alert("Error in Getting Client Information");
+                    },
+                });
+            }
 
           $("#save_client").click(function(){
             var mobileNumbers = get_mobile_info('mob');
@@ -207,7 +235,7 @@
             };
 
             var landline_no = $('#landline').val().trim();
-            if (landlineNumbers.length == 0 && validateMobileNumber(cleanMobileNumber(landline_no))){
+            if (landlineNumbers.length == 0 && validateLandlineNumber(landline_no)){
                 if (confirm(landline_no + " - Do you want to add this number and then Save ?")){
                     $("#add_landline").click();
                     landlineNumbers = get_landline_info('landline');
@@ -220,7 +248,6 @@
             }
 
             json = ConvertFormToJSON("form");
-//            json["pin_code"] = $("#pin_code").val();
 
             var contactInformation = {}
             contactInformation['mobile'] = mobileNumbers;
@@ -228,42 +255,75 @@
             contactInformation['landline'] = landlineNumbers;
             json["contactInformation"] = contactInformation;
 
-            farmer_id = $("#edit_farmer").text();
-            if (farmer_id){
+            client_id = $("#edit_client").text();
+            if (client_id){
                 request_type = 'put';
-                json['farmer_id'] = farmer_id;
+                json['client_id'] = client_id;
             }
             else {
                 request_type = 'post';
             }
-        console.log(json);
-        console.log(request_type);
-            // $.ajax(
-            // {
-            //     url: "{{client_service_url}}" + "clientdetails/",
-            //     type: request_type,
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //         'X-Authorization-Token':"{{request.session.userservice_key}}"
-            //     },
-            //     data: JSON.stringify(json),
-            //     success : function(data)
-            //     {
-            //         console.log(data);
-            //         // if (data.responseData.farmer_id){
-            //         //   window.location = '/crm/farmer/view/' + data.responseData.farmer_id;
-            //         // }
-            //         // else {
-            //         //     swal(data.responseData);
-            //         // }
-            //     },
-            //     error : function(data)
-            //     {
-            //         alert("Something Went Wrong !");
-            //     },
-            // });
-            return false;
+            console.log(json);
+        
+            $.ajax(
+            {
+                url: "{{client_service_url}}" + "clientdetails/",
+                type: request_type,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Authorization-Token':"{{request.session.userservice_key}}"
+                },
+                data: JSON.stringify(json),
+                success : function(data)
+                {
+                    console.log(data);
+                    if (data.responseData.client_id){
+                      window.location = '/erp/client/view/' + data.responseData.client_id;
+                    }
+                    else {
+                        swal(data.responseData);
+                    }
+                },
+                error : function(data)
+                {
+                    alert("Something Went Wrong !");
+                },
+            });
+            // return false;
         });
+
+        function populate_info(info){
+            $("#client_name").val(info.client_name);
+            
+            // $("#description").val(info.description);
+            // $("#referer").val(info.referer);
+            
+            if (info.mobile != 'Not Available'){
+              for(i=0;i<info.mobile.length;i++){
+                add_mobile_pill(info.mobile[i]);
+              }
+            }
+            if (info.whatsapp != 'Not Available'){
+              for(i=0;i<info.whatsapp.length;i++){
+                add_whatsapp_pill(info.whatsapp[i]);
+              }
+            }
+            if (info.landline != 'Not Available'){
+              for(i=0;i<info.landline.length;i++){
+                add_landline_pill(info.landline[i]);
+              }
+            }
+            
+            $.each(info.billing_address, function(index, billing_address){
+                if (billing_address.id == info.billing_addressid){
+                    $("#address_line1").val(billing_address.address_line1);
+                    $("#area").val(billing_address.area);
+                    $("#city").val(billing_address.city);
+                    $("#state").val(billing_address.state);
+                    $("#pin_code").val(billing_address.pin_code);
+                };
+            });
+        }
 
       });
       

@@ -10,6 +10,13 @@ def search_client(request):
     )
 
 @login_required
+def view_client(request):
+    return render_to_response(
+        "client_view.html",
+        RequestContext(request)
+    )
+
+@login_required
 def create_edit_client(request):
     return render_to_response(
         "client_create.html",

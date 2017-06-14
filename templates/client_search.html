@@ -115,8 +115,8 @@
             $.each( result, function( index, client ){
                 var row = "<tr>";
                     row += "<td style=vertical-align:middle>" + client.client_id + "</td>";
-                    // row += "<td style=vertical-align:middle><a href=/crm/farmer/view/" + farmer.farmer_id + ">"+ farmer.first_name + ' ' + farmer.middle_name + ' ' + farmer.last_name + "</a></td>";
-                    row += "<td style=vertical-align:middle>" + client.name + "</td>"; 
+                    row += "<td style=vertical-align:middle><a href=/erp/client/view/" + client.client_id + ">"+ client.name + "</a></td>";
+                    // row += "<td style=vertical-align:middle>" + client.name + "</td>"; 
                     row += "<td style=vertical-align:middle><a href=''><i class='glyphicon glyphicon-pencil'></i></a></td>";
                     row += "<td style=vertical-align:middle><a href=''><i class='glyphicon glyphicon-shopping-cart'></i></a></td>";
                     row += "<td style=vertical-align:middle>" + client.order_count + "</td>";

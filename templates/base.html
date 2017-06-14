@@ -7,7 +7,7 @@
 		<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}" />
 		<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 		<link rel="stylesheet" href="{% static 'css/menubar_style.css' %}">
-    <!-- <link rel="stylesheet" href="{% static 'css/bootstrap-datetimepicker.min.css' %}"> -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap-datetimepicker.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/sweetalert.css' %}">
     <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -18,7 +18,7 @@
     <script src="{% static 'js/common.js' %}"></script>
     <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
     <!-- <script src="{% static 'js/jquery.canvasjs.min.js' %}"></script> -->
-<!--     <script src="{% static 'js/bootstrap-datetimepicker.min.js' %}"></script>-->
+    <script src="{% static 'js/bootstrap-datetimepicker.min.js' %}"></script>
     <script src="{% static 'js/sweetalert.min.js' %}"></script> 	
 
   </head>
@@ -41,7 +41,7 @@
                         		<li><a href="/erp/catalog/view"><strong>Products</strong></a></li>
                         		<li><a href="/erp/salesorder/search/"><strong>Orders</strong></a></li>
                         		<!-- <li><a href="/erp/salesorder/calls/"> <strong>Manage Calls</strong></a></li> -->
-                            <li><a href="/erp/salesorder/schedule_calls/"> <strong>Scheduled Calls</strong></a></li>
+                            <li><a href="/erp/client/schedule_calls/"> <strong>Scheduled Calls</strong></a></li>
                             {% if operation_user %}
             						      <li id="operation_menu"><a href="/operational_dashboard/"> <strong>Operations</strong> </a></li>
           						      {% endif %}
