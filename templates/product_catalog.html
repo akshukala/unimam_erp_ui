@@ -7,13 +7,9 @@
     <br>
       <div class="row">
         <div class="col-md-3">
-          <!-- <div class="form-group form-inline">
-              <label>Search Product : &emsp;</label>
-              <input type="text" name="search" id="search" class="form-control"/>
-          </div> -->
-          <!-- <div class="text-center">
-            <button class="btn btn-lg btn-primary" id="search_btn" ><span class="glyphicon glyphicon-search"></span>Search</button>
-          </div> -->
+          <div class="text-center">
+             <button id="addProduct" class="btn btn-primary" data-toggle="modal" data-target="#product_modal"></span>Add Product </button>
+          </div>
           <br>
           <div class="panel panel-default sidebar-menu">
             <div class="panel-heading">
@@ -42,7 +38,130 @@
         </div>
       </div>
     </div>
+    <!-- Schedule Modal -->
+    <div class="modal fade" id="product_modal" role="dialog">
+      <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Add Product</h4>
+          </div>
+          <div class="modal-body">
+              <div class="errors_product_modal"></div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group form-inline">
+                <label>Select Category:</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group form-inline">
+                <select class="form-control" id="select_category">
+                    <option value='select'>Select Category</option>
+                </select>
+              </div>
+            </div>
+          </div>
+         <div class="row">
+          <div class="col-md-4">
+            <div class="form-group form-inline">
+              <label>Product Name:</label>
+            </div>
+            </div>
+          <div class="col-md-6">
+            <div class="form-group form-inline">
+              <input type="text" class="form-control" id="product_name">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group form-inline">
+              <label>Product Code</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group form-inline">
+              <input type="text" class="form-control" id="product_code">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group form-inline">
+              <label>Product Weight:</label>
+            </div>
+            </div>
+          <div class="col-md-6">
+            <div class="form-group form-inline">
+              <input type="text" class="form-control" id="product_weight">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group form-inline">
+              <label>Product MRP:</label>
+            </div>
+            </div>
 
+          <div class="col-md-6">
+            <div class="form-group form-inline">
+              <input type="text" class="form-control" id="product_mrp">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group form-inline">
+              <label>Selling Price:</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group form-inline">
+              <input type="text" class="form-control" id="product_sellingprice">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group form-inline">
+              <label>Product GST(%):</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group form-inline">
+              <input type="text" class="form-control" id="product_gst">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group form-inline">
+              <label>Product Description:</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group form-inline">
+            <textarea class="form-control" id="product_description"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12 text-center" id="product_div">
+            <button id="saveproduct_btn" class="btn btn-primary">Submit</button>
+          </div>
+        </div>
+        </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+<!--Modal end--> 
     <script type="text/javascript"> 
         $(document).ready(function() {
           $('#search_results').DataTable();
@@ -58,6 +177,10 @@
                                         result = data['responseData'];
                                         console.log(result);
                                         populate_category(result);
+                                        for(i=0;i<result.length;i++){
+                                          data = "<option value='"+result[i]['id']+"'>"+result[i]['name']+"</option>";
+                                          $("#select_category").append(data);
+                                        }
                                     },
                                     error : function(error)
                                     {
@@ -80,7 +203,6 @@
                         li_element.append(span);
                         li_element.appendChild(checkbox_text);
                         $("#category_section").append(li_element);
-
                         checkbox.onclick = function(){
                             category_id = this.id;
                             if ($(this).prop('checked')==true){ 
@@ -123,5 +245,119 @@
                 });
               }
         });
+
+      $("#saveproduct_btn").click(function(){
+                        var errors=[];
+                        var select_category = $("#select_category").val();
+                        var product_name = $("#product_name").val();
+                        var product_code = $("#product_code").val();
+                        var product_weight = $("#product_weight").val();
+                        var product_mrp = $("#product_mrp").val();
+                        var product_sellingprice = $("#product_sellingprice").val();
+                        var product_gst = $("#product_gst").val();
+                        var product_description = $("#product_description").val();
+
+                        $("#select_category").css({"border-color": "#ccc"});
+                        $("#product_name").css({"border-color": "#ccc"});
+                        $("#product_code").css({"border-color": "#ccc"});
+                        $("#product_mrp").css({"border-color": "#ccc"});
+                        $("#product_sellingprice").css({"border-color": "#ccc"});
+                        $("#product_gst").css({"border-color": "#ccc"});
+
+                        if (select_category == "select") {
+                              errors[errors.length] = "Select Product Category.";
+                              $("#select_category").css({"border-color": "#ff4c4c"});
+                              $("#select_category").focus();
+                            }
+                        
+                        if (product_name.length == 0) {
+                                errors[errors.length] = "Enter Product Name.";
+                                $("#product_name").css({"border-color": "#ff4c4c"});
+                                $("#product_name").focus();
+                            }
+                        if (product_code.length == 0) {
+                                errors[errors.length] = "Enter Product Code.";
+                                $("#product_code").css({"border-color": "#ff4c4c"});
+                                $("#product_code").focus();
+                            }
+                         if (product_mrp.length == 0) {
+                                errors[errors.length] = "Enter Product MRP.";
+                                $("#product_mrp").css({"border-color": "#ff4c4c"});
+                                $("#product_mrp").focus();
+                            }
+                         if (product_sellingprice.length == 0) {
+                                errors[errors.length] = "Enter Product Selling Price.";
+                                $("#product_sellingprice").css({"border-color": "#ff4c4c"});
+                                $("#product_sellingprice").focus();
+                            }
+                         if (product_gst == 0) {
+                                errors[errors.length] = "Enter product GST.";
+                                $("#product_gst").css({"border-color": "#ff4c4c"});
+                                $("#product_gst").focus();
+                            }
+                        if (errors.length > 0) {
+                                reportProductErrorsModal(errors);
+                                return false;
+                            }
+
+                       $.ajax(
+                        {
+                            type: 'post',
+                            url: "{{client_service_url}}"+"products_categories/",
+                            headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}",
+                                  'content_type':'application/json'},
+                            dataType: 'json',
+                            data: JSON.stringify({  'p_category': select_category,
+                                                    'p_name': product_name,
+                                                    'p_code': product_code,
+                                                    'p_weight': product_weight,
+                                                    'p_mrp': product_mrp,
+                                                    'p_sellingprice': product_sellingprice,
+                                                    'p_gst': product_gst,
+                                                    'p_desc': product_description,
+                                                }),
+                            success : function(result)
+                                    {
+                                      console.log(result);
+                                      responseCode = result['responseData']['responseCode']
+                                      if (responseCode == 200) {
+                                         swal({
+                                            title: "Success!!!",
+                                            text: result['responseData']['Message'],
+                                            type: "success",
+                                           },
+                                          function(){
+                                            location.reload();
+                                          });
+                                      }else{
+                                        swal({
+                                            title: "Error!!!",
+                                            text: result['responseData']['Message'],
+                                            type: "error",
+                                           },
+                                          function(){
+                                            location.reload();
+                                          });
+                                      }
+                                    },
+                                    error : function(error)
+                                    {
+                                        window.alert(error);
+                                    },
+                        });
+
+        function reportProductErrorsModal(errors){
+                        $('.errors_product_modal').empty();
+                                var msg = [];
+                                for (var i = 0; i<errors.length; i++) {
+                                    var numError = i + 1;
+                                    msg [i]= "\n" + numError + ". " + errors[i] ;
+                                }
+                                $.each(msg, function(){
+                                    $('.errors_product_modal').append("<div class='alert alert-danger alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button>" + this +"</div>");
+                                });
+               }
+        });
+                       
     </script>
 {% endblock %}
