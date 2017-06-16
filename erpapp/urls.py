@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from erpapp import erp, client, catalog, scheduling
+from erpapp import erp, client, catalog, scheduling, salesorder
 
 urlpatterns = [
     url(r'^$', erp.dashboard),
@@ -8,5 +8,6 @@ urlpatterns = [
     url(r'^client/edit/', client.create_edit_client),
     url(r'^client/view/', client.view_client),
     url(r'^client/schedule_calls/', scheduling.call_scheduling),
+    url(r'^salesorder/create/', salesorder.create_salesorder),
     url(r'^catalog/view/', catalog.view_catalog),
 ]

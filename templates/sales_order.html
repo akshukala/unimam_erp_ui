@@ -1,0 +1,859 @@
+    {% extends 'base.html' %}
+    {% load staticfiles %}
+    {% block content %}
+    
+    <style type="text/css">
+      .logo {
+        width:120px;
+        height:30px;
+      }
+      .ui-datepicker{
+        font-size:11px;
+      }
+      table {
+        font-size: 12px;
+      }
+      form {
+        font-size: 13px;
+      }
+      td input{
+        text-align:center;
+      }
+      #product_table input{
+        width:100%
+      }
+      #product_table{
+        table-layout:fixed;
+      }
+      #product_table td:first-child{
+        width:360px;
+      }
+      #product_table td:last-child{
+        width:130px;
+      }
+      #product_table td:nth-child(3),
+      #product_table td:nth-child(4),
+      #product_table td:nth-child(5),
+      #product_table td:nth-child(6),
+      #product_table td:nth-child(7)
+      {
+        width:130px;
+      }
+      #summary input{
+        width:100px;
+      }
+      #int_note{
+        width:300px;
+        height:60px;
+      }
+      #adv_pay_note{
+        width:250px;
+      }
+      .glyphicon {
+        font-size: 18px;
+      }
+      .product_row {
+        background:lightgreen;
+      }
+      .pill {
+        display:inline-block;
+        margin:5px 5px 5px 7px;
+        padding:2px 10px;
+        background:#eff2e9;
+        border-radius:4px;
+        cursor: default;
+        border:1px solid transparent;
+      }
+      .pill a {
+        padding:5px 5px;
+      }
+      .ui-autocomplete {
+        max-height:300px;
+        overflow-y:auto;
+        overflow-x:hidden;
+        width:550px;
+        font-size:13px;
+      }
+      .blue {
+        color: green;
+      }
+    </style>
+		
+    <div class="container" style="margin-top:30px;">
+      <span class="pill" id="name"></span>
+      <span class="pill" id="contact"></span>
+      <!-- <span class="pill" id="description"></span> -->
+      <span id="client_name" style="display:none"></span>
+      <!-- <span id="last_name" style="display:none"></span> -->
+      <span id="client_id" style="display:none"></span>
+      <span id="order_id" style="display:none"></span>
+      <form class="form-horizontal" method="post" action="">
+      <fieldset>
+        {% csrf_token %}
+      <div class="row">
+        <div class="col-md-2 panel panel-heading"> Products Details</div>
+      </div>
+
+      <table id="product_table" class="table table-bordered text-center vcenter">
+        <thead>
+          <tr style="background:lightgray">
+            <td> Item Name </td>
+            <td> Qty in Stock </td>
+            <td> Quantity </td>
+            <td> MRP </td>
+            <td> Unit Selling Price </td>
+            <td> Net Price </td>
+            <td> Add </td>
+          </tr>
+          <tr>
+            <td><input id="item_name" name="item_name" class="form-control input-md ac_catalogue" type="text"></td>
+            <td><input id="qty_stock" name="qty_stock" class="form-control" readonly></td>
+            <td><input id="qty" name="qty" class="form-control input-md qty" type="text"></td>
+            <td><input id="list_price" name="list_price" class="form-control" readonly></td>
+            <td><input id="selling_price" name="selling_price" class="form-control selling_price" readonly></td>
+            <td><input id="net_price" name="net_price" class="form-control net_price" readonly></td>
+            <td><a class="btn btn-success" id="add" onclick=add_product()><i class="glyphicon glyphicon-plus"></i></a></td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:lightblue">
+            <td colspan=7> <span> Products in Cart <i class="glyphicon glyphicon-shopping-cart"></i></span></td>
+          </tr>
+          <tr style="background:lightblue"></tr>
+        </tbody>
+      </table>
+
+      <!-- <div class="row">
+        <div class="col-md-12" style="margin-bottom:10px">
+          <div class="col-md-6 pull-left panel-heading" id="coupon_avilable">
+            <div class="form-group form-inline">
+              <select class="form-control" style="display: inline;" id="couponCode">
+                <option value='select'>Available Coupon</option>
+              </select> &emsp;
+              <label id="coupondescription" style="display: inline; color:  #6B8E23"></label>
+            </div>
+          </div>
+          <div class="col-md-6" id="coupon_not_avail">
+            <label><h4>No Coupon Available</h4></label>
+          </div>
+          <div class="col-md-5 pull-right" id="toastMessage"></div>
+            <input type="hidden" id="couponApplied">
+        </div>
+      </div> -->
+          
+      <table class="table table-bordered text-center vcenter" id="summary">
+        <tr>
+          <td><b> MRP Total </b></td>
+          <td><input readonly id="mrp_total" class="form-control" name="mrp_total" value=0></td>
+          <td><b> Net Total </b></td>
+          <td><input readonly id="net_total" class="form-control" name="net_total" value=0></td>
+          <td><b> Order Discount </b></td>
+          <td><input id="order_disc_amnt" class="form-control" name="OrderDiscount" value=0></td>
+          <td><b> Delivery Charge </b></td>
+          <td><input id="delivery_charge" class="form-control" name="DeliveryCharge" value=0></td>
+          <td><b> Total Discount Percent </b></td>
+          <td id="disc_percent"> 0.0 % </td>
+          <td><b> Grand Total </b></td>
+          <td><input readonly id="grand_total" class="form-control" name="GrandTotal" value=0></td>
+        </tr>
+      </table>
+
+      <div class="row form-group">
+        <div class="col-md-1 control-label"><b> Advance Payment </b></div>
+          <div class="col-md-2">
+            <input id="adv_payment" class="form-control input-md" name="AdvancePayment" value=0>
+          </div>
+          <div class="col-md-1 control-label"><b>Adv. Payment Note</b></div>
+          <div class="col-md-3">
+            <textarea id="adv_pay_note"  class=" form-control"name="AdvPayNote"></textarea>
+          </div>
+          <div class="col-md-1" style="margin-left: -30px; margin-top: 15px;">
+            <input type="hidden" id="adv_pay_date"/>
+          </div>
+          <div class="col-md-1 control-label"><b> COD Amount </b></div>
+          <div class="col-md-2">
+            <input id="cod_amnt" class="form-control input-md" name="CodAmount" readonly>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-2 panel panel-heading"> Order Details</div>
+        </div>
+        
+        <div class="row form-group">
+          <label class="col-md-2 control-label" for="carrier">Billing Address </label>
+          <div class="col-md-4" id="billing_address"></div>
+          <label class="col-md-2 control-label" for="carrier">Shipping Address </label>
+          <div class="col-md-4" id="shipping_address"></div>
+        </div>
+          
+        <div class="row form-group">
+          <label class="col-md-2 control-label" for="payment">Payment</label>
+          <div class="col-md-2">
+            <div class="radio-inline">
+              <input type="radio" name="CashOnDelivery" value="true" checked>COD
+            </div>
+            <div class="radio-inline">
+              <input type="radio" name="CashOnDelivery" value="false">Prepaid
+            </div>
+          </div>
+        </div>
+
+        <div class="row form-group">
+          <label class="col-md-2 control-label" for="adv_order">Advance Order</label>  
+          <div class="col-md-1">
+            <div class="checkbox-inline">
+              <input name="adv_order" id="adv_order" value="adv_order" type="checkbox">
+            </div>
+          </div>
+          <label class="col-md-2 control-label" for="adv_date">Advance Order Date</label>
+          <div class="col-md-2">
+            <input id="adv_date" name="AdvanceOrderDate" class="form-control input-md" type="text">
+          </div>
+          <label class="col-md-1 control-label" for="int_note">Internal Note</label>
+          <div class="col-md-2">
+            <textarea class="form-control" id="int_note" name="InternalNote"></textarea>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <div class="col-md-8 text-center">
+            <button id="save" name="save" class="btn btn-large btn-success"> Create Sales Order</button>
+            <button class="btn btn-large btn-danger" type="button" onclick=history.go(-1)> Cancel </button>
+          </div>
+        </div>
+        </fieldset>
+        </form>
+      </div>
+
+      <script src="{% static 'js/common.js' %}"></script>
+      <script type="text/javascript">
+         $(document).ready(function (){
+            //var coupon_result;
+            $("#adv_date").datepicker({
+                minDate: 0,
+                changeMonth: true,
+                changeYear: true, 
+                dateFormat:'dd-MM-yy',
+                yearRange: "2016:2018"
+            });
+            $("#adv_pay_date").datepicker({
+                buttonImage: "{% static 'images/calendar.gif' %}",
+                buttonImageOnly: true,
+                changeMonth: true,
+                changeYear: true,
+                dateFormat:'dd-mm-yy',
+                yearRange: "2016:2018",
+                showOn: 'both',
+                onSelect: function(dateText, inst){
+                    var note = $("#adv_pay_note").val()
+                    if (note){
+                        note += '\n';
+                    }
+                    note += 'Payment Date : ' + dateText;
+                    $("#adv_pay_note").val(note);
+                }
+            });
+
+            // if ($("#new_address").prop('checked') == true){
+            //     $(".address").show();
+            // }
+            // else{
+            //     $(".address").hide();
+            // };
+            $("#adv_order").prop('checked', false);
+            $("#adv_date").val('');
+            $("#adv_date").prop('disabled', true);
+            $("#adv_payment").val('0');
+
+            // $("#coupon_not_avail").hide();
+            // $("#coupon_avilable").hide();
+            update_cart_price();
+            
+            var currentUrl = window.location.href;
+            url_id = currentUrl.split('/')[6];
+            $.ajax({
+                url: "{{client_service_url}}" + "clientdetails/",
+                headers: {'X-Authorization-Token':"{{request.session.userservice_key}}"},
+                type: 'get',
+                dataType: 'json',
+                data : {"client_id": url_id},
+                success : function(data)
+                {   
+                    //console.log(data);
+                    if (data.responseData == "ClientNotFound"){
+                        swal("Client Not Found");
+                        window.location = '/erp/client/search/';
+                    };
+                    populate_info(data.responseData);
+                },
+                error : function(data)
+                {
+                    alert("Error in Getting Client Information");
+                },
+            });
+
+            $(".ac_catalogue").autocomplete({
+                source: function(request, response){
+                    var autocomplete_url = "{{client_service_url}}" + "catalogcomplete/";
+                    $.ajax({
+                        url: autocomplete_url,
+                        type:'get',
+                        data : {"name": request.term},
+                        success:function(data) {
+                            var availableTags = [];
+                            for(var x = 0;x<data['responseData'].length;x++){
+                              availableTags.push(data['responseData'][x]['item_sku']
+                                        +'-'+data['responseData'][x]['name']
+                                        +'-'+data['responseData'][x]['mrp']
+                                        +'-'+data['responseData'][x]['sellingPrice']);
+                            }           
+                            $( "#item_name" ).autocomplete({
+                              source: availableTags
+                             
+                            });
+                    });
+                },
+                select: function(event, ui) {
+                  
+                  var values = JSON.stringify(ui.item['value']).split('-');
+                  var mrp = values[2]
+                  var selling_price = values[3].replace('"','')
+                  var sku = values[0]
+                    $("#add").prop('disabled', true);
+                    //$("#sku").val(sku);
+                    $("#item_name").val(ui.item.product_name);
+                    $("#selling_price").val(selling_price);
+                    $("#list_price").val(mrp);
+                    $("#qty").val('1');
+                    //$("#discount").val('0');
+                    var quantity = document.getElementById('qty').value;
+             
+                    var net_price = parseInt(selling_price);
+                    $("#net_price").val(net_price);
+                    //$("#add").addClass('disabled');
+                    //get_inventory(ui.item.sku_code, $("#qty_stock"));
+                },
+                change: function(event,ui){
+                    if (ui.item==null){
+                        clear_product_row();
+                    }
+                }
+            });
+
+            // $.ajax(
+            // {
+            //     url: "{{order_management_service_url}}" + "get_farmer_coupon/",
+            //     headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}"},
+            //     type: 'get',
+            //     dataType: 'json',
+            //     data : {"farmer_id": url_id},
+            //     success : function(data)
+            //     {
+            //         //console.log(data);
+            //         coupon_result = data['responseData'];
+            //         if(coupon_result['responseCode']=="400"){
+            //           $("#coupon_not_avail").show();
+            //         }
+            //         else{
+            //           $("#coupon_avilable").show();
+            //           $("#couponCode").prop("disabled", true);
+            //           for(i=0;i<coupon_result['response'].length;i++){
+            //                               var data = "<option value='"+coupon_result['response'][i]['coupon_id']+"'>"+coupon_result['response'][i]['shortcode']+"</option>";
+            //                               $("#couponCode").append(data);
+            //                             }
+            //         }
+            //     },
+            //     error : function(data)
+            //     {
+            //         alert("Error in Getting Farmer Information");
+            //     },
+            // });
+
+            
+            // var salesorderid = currentUrl.split('/')[7];
+            // if (salesorderid && currentUrl.indexOf('edit') != -1){
+            //     $("#order_id").text(salesorderid);
+            //     $.ajax({
+            //         url: "{{order_management_service_url}}" + "saleorder/",
+            //         headers: {'X-Authorization-Token':"{{request.session.userservice_key}}"},
+            //         type: 'get',
+            //         dataType: 'json',
+            //         data : {"Code": salesorderid, "Type":"local"},
+            //         success : function(data)
+            //         {
+            //             if (data.responseData.message == "Invalid Order Code"){
+            //                 alert("We couldn't find this order");
+            //             }
+            //             console.log(data);
+            //             populate_order(data.responseData);
+            //         },
+            //         error : function(data)
+            //         {
+            //             alert("Error in Getting SalesOrder Information");
+            //         },
+            //     });
+            // }
+
+
+            // $('#item_name').on('autocompletechange change', function () {
+            //             item = $(this).val();
+                      
+            //             $.ajax(
+            //               {
+            //                   type:'post',
+            //                   url: "{{crm_service_url}}" + "getProductStock/",
+            //                   headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}"},
+            //                   dataType: 'json',
+            //                   data: JSON.stringify({
+            //                     'product_name': item
+              
+            //                 }),
+            //                   success : function(result)
+            //                   {
+            //                      console.log(result);
+            //                      product_stock=result['responseData'];
+            //                      $("#qty_stock").val(product_stock);
+                                 
+            //                   },
+            //                    error : function(data)
+            //                   {
+            //                       alert("Error in getting Product Name");
+            //                   },
+            //               });
+            // });
+
+            // $("#couponCode").change(function(){
+            //     var coupon_id = $(this).val();
+            //     var discount_amount = 0;            
+            //     for(i=0;i<coupon_result['response'].length;i++){
+            //       if(coupon_result['response'][i]['coupon_id'] == coupon_id){
+            //         console.log(coupon_result['response'][i]['desc']);
+            //         $("#coupondescription").html(coupon_result['response'][i]['desc']);
+            //         discount_amount=coupon_result['response'][i]['coupon_amount'];
+            //         break;
+            //       }
+            //     }
+            //     var grand_total = $("#grand_total").val();
+            //     var mrp_amount = $("#mrp_total").val();
+            //     var disc_per = $("#disc_percent").text()
+            //     var after_discount = (grand_total - discount_amount).toFixed(2);
+                
+            //     var discount_percent = (((mrp_amount-(grand_total+discount_amount))/mrp_amount)*100).toFixed(2);
+            //     $("#grand_total").val(after_discount);
+            //     $("#cod_amnt").val(after_discount);
+            //     $("#disc_percent").html(discount_percent+"%");
+            //     $(".net_price").val(after_discount);
+            //     $("#order_disc_amnt").val(discount_amount);
+            //     $("#order_disc_amnt").focus();
+            // });
+        });
+
+        function populate_info(info){
+          if (info.client_id && (!(info.client_name))){
+                swal("Please Enter Valid Name of Client before creating order");
+                window.location = "/erp/client/edit/" + info.client_id;
+            }
+            $("#name").html("<a href=/erp/farmer/view/" + info.client_id + ">" + info.client_name + "</a>");
+            $("#client_id").text(info.client_id);
+            // var contact_string = "";
+            // if (info.mobile_1){
+            //     contact_string = info.mobile_1;
+            // }
+            // if (info.mobile_2){
+            //     contact_string += ' / ' + info.mobile_2;
+            // }
+            // if (info.mobile_3){
+            //     contact_string += ' / ' + info.mobile_3;
+            // }
+            // $("#contact").text(contact_string);
+            
+            baddress_html = "";
+            $.each(info.billing_address, function(index, billing_address){
+                json = billing_address
+                baddress_html += "<div class=radio><input type=radio name=BAddressId value=";
+                baddress_html += billing_address.id + ">" +json.address_line1 + ' ' + json.area + ' ';
+                baddress_html += json.city + ' - ' + json.pin_code + " " + json.state + "</input></div>";
+            });
+            $("#billing_address").html(baddress_html);
+            $("[name=BAddressId][value=" + info.billing_addressid +"]").prop('checked', true);
+
+            saddress_html = "";
+            $.each(info.shipping_address, function(index, shipping_address){
+                json = shipping_address
+                saddress_html += "<div class=radio><input type=radio name=SAddressId value=";
+                saddress_html += shipping_address.id + ">" + json.address_line1 + ' ' + json.area + ' ';
+                saddress_html += json.city + ' - ' + json.pin_code + " " + json.state + "</input></div>";
+            });
+            $("#shipping_address").html(saddress_html);
+            $("[name=SAddressId][value=" + info.shipping_addressid +"]").prop('checked', true);
+        };
+
+        // $("#new_address").change(function() {
+        //     if(this.checked) {
+        //         $(".address").show();
+        //     }
+        //     else{
+        //         $(".address").hide();
+        //     }
+        // });
+
+        $("#adv_order").change(function() {
+            if(this.checked) {
+                $("#adv_date").prop('disabled', false);
+            }
+            else{
+                $("#adv_date").val('');
+                $("#adv_date").prop('disabled', true);
+            }
+        });
+
+        //  function populate_order(info){
+        //     SaleOrder = info.SaleOrder;
+        //     $("#farmer_id").text(SaleOrder.owner.FarmerId);
+        //     $("[name=BAddressId][value=" + SaleOrder.billing_address.id + "]").prop('checked', true);
+        //     $("[name=SAddressId][value=" + SaleOrder.shipping_address.id +"]").prop('checked', true);
+        //     $("[name=CashOnDelivery][value=" + SaleOrder.cash_on_delivery + "]").prop('checked', true);
+        //     if (SaleOrder.advance_order_date){
+        //         $("#adv_order").prop('checked', true);
+        //         $("#adv_date").prop('disabled', false);
+        //         var adv_date = new Date(SaleOrder.advance_order_date)
+        //         $("#adv_date").datepicker("setDate", adv_date);
+        //     };
+        //     $("#int_note").val(SaleOrder.internal_note);
+        //     $("#order_disc_amnt").val(SaleOrder.order_discount);
+        //     $.each(info.SaleOrderItem, function(index, item){
+        //         var pdetails = {}
+        //         console.log(item.item_name);
+        //         pdetails["item_name"] = item.item_name;
+        //         pdetails["sku"] = item.item_sku;
+        //         pdetails["qty"] = item.quantity;
+        //         pdetails["selling_price"] = item.selling_price;
+        //         pdetails["discount"] = item.discount;
+        //         pdetails["net_price"] = item.total_price;
+        //         pdetails["qty_stock"] = '';
+        //         pdetails["list_price"] = item.list_price;
+        //         prow = add_product_row(pdetails);
+        //     });
+        //     $("#adv_payment").val(SaleOrder.advance_payment);
+        //     $("#adv_pay_note").val(SaleOrder.adv_pay_note);
+        //     $("#cod_amnt").val(SaleOrder.cod_amount);
+        // }
+
+        function attach_price_events(){
+            $(".qty").focusout(function() {
+                var row = $(this).closest('tr');
+                var qty = $(this).val().trim();
+                if (qty == "" || $.isNumeric(qty) == false || parseFloat(qty) < 1){
+                    show_error("cart_error", "Please Enter Valid Quantity");
+                    $(this).val('1');
+                };
+                update_product_price(row);
+                update_cart_price();
+            });
+
+            $(".discount").focusout(function() {
+                var row = $(this).closest('tr');
+                var selling_price = $(row).find(".selling_price").val();
+                var disc = $(this).val().trim();
+                if (disc == "" || $.isNumeric(disc) == false || parseFloat(disc) < 0){
+                    show_error("cart_error", "Please Enter Valid Discount");
+                    $(this).val('0');
+                    $(this).focus();
+                };
+                if (parseFloat(disc) > parseFloat(selling_price)){
+                    show_error("cart_error", "Discount can't be more than selling price");
+                    $(this).val('0');
+                    $(this).focus();
+                };
+                update_product_price(row);
+                update_cart_price();
+            });
+        };
+
+        attach_price_events();
+
+        $("#order_disc_amnt").focusout(function(){
+            amount = $(this).val().trim()
+            if (amount == "" || $.isNumeric(amount) == false || parseFloat(amount) < 0){
+                show_error("cart_error", "Enter valid discount amount");
+                $(this).val(0);
+            }
+            update_cart_price();
+        });
+
+         $("#delivery_charge").focusout(function(){
+            amount = $(this).val().trim()
+            if (amount == "" || $.isNumeric(amount) == false || parseFloat(amount) < 0){
+                show_error("cart_error", "Enter valid discount amount");
+                $(this).val(0);
+            }
+            update_cart_price();
+        });
+
+        function update_product_price(row){
+            var qty = $(row).find('td .qty').val();
+            var selling_price = $(row).find('td .selling_price').val();
+            var discount = $(row).find('td .discount').val();
+            var net_price = $(row).find('td .net_price');
+            var amount = Number((selling_price) * qty).toFixed(2);
+            $(net_price).val(amount);
+        };
+
+        function update_cart_price(){
+            var products = $("#product_table .product_row")
+            for(i=0; i<products.length; i++){
+                update_product_price(products[i]);
+            };
+
+            var total_discount = parseFloat(0).toFixed(2);
+            for (i=0; i<products.length; i++){
+                ind_disc = $(products[i]).find('.discount').val();
+                ind_qty = $(products[i]).find('.qty').val();
+                if (ind_disc == undefined){
+                    ind_disc = 0;
+                };
+                total_discount = (parseFloat(total_discount) + parseFloat(ind_disc * ind_qty)).toFixed(2);
+            };
+
+            var mrp_total = parseFloat(0).toFixed(2);
+            for (i=0; i<products.length; i++){
+                ind_mrp = $(products[i]).find('.list_price').val();
+                ind_qty = $(products[i]).find('.qty').val();
+                if (ind_mrp == undefined){
+                    ind_mrp = 0;
+                };
+                mrp_total = (parseFloat(mrp_total) + parseFloat(ind_mrp * ind_qty)).toFixed(2);
+            };
+            $("#mrp_total").val(mrp_total);
+
+            var net_total = parseFloat(0).toFixed(2);
+            for (i=0; i<products.length; i++){
+                ind_net = $(products[i]).find('.net_price').val();
+                if (ind_net == undefined){
+                    ind_net = 0;
+                };
+                net_total = (parseFloat(net_total) + parseFloat(ind_net)).toFixed(2);
+            };
+            $("#net_total").val(net_total);
+
+            if (parseFloat(net_total) == 0){
+                $("#order_disc_amnt").val('0');
+            };
+
+            order_disc_amnt = parseFloat($("#order_disc_amnt").val()).toFixed(2);
+            total_discount = (parseFloat(total_discount) + parseFloat(order_disc_amnt)).toFixed(2);
+            disc_percent = (((mrp_total - net_total + parseFloat(order_disc_amnt)) * 100) / mrp_total).toFixed(2);
+            if (isNaN(disc_percent)){
+                disc_percent = 0.0;
+            }
+            $("#disc_percent").text(disc_percent + "%")
+            grand_total = net_total - parseFloat(order_disc_amnt).toFixed(2);
+            //adding delivery charges.
+            if(parseFloat(grand_total).toFixed(2) < 800 && parseFloat(grand_total).toFixed(2)!=0){
+              grand_total = (parseFloat(grand_total) + parseFloat(100)).toFixed(2)
+            }
+            else{
+              delivery_charge = $("#delivery_charge").val();
+              grand_total = (parseFloat(grand_total) + parseFloat(delivery_charge)).toFixed(2);
+            }
+            $("#grand_total").val(parseFloat(grand_total).toFixed(2));
+            $(".net_price").val(parseFloat(grand_total).toFixed(2));
+
+            cod_amnt = (parseFloat(grand_total) - parseFloat($("#adv_payment").val())).toFixed(2);
+            if ( cod_amnt < 0 ){
+                show_error("cart_error", "Advance Payment can't be more than grand total")
+                $("#adv_payment").val(0);
+                cod_amnt = (parseFloat(grand_total) - parseFloat($("#adv_payment").val())).toFixed(2);
+                $("#cod_amnt").val(cod_amnt);
+            }
+            else{
+                $("#cod_amnt").val(cod_amnt);
+            }
+        }
+
+        function add_product(){
+            if ($("#item_name").val() == ''){
+                show_error("cart_error", 'Please Select Product First');
+                $("#item_name").focus();
+                return false;
+            };
+            var pdetails = {}
+            x = $("#item_name").val();
+            
+            pdetails["item_name"] = $("#item_name").val();
+            pdetails["sku"] = $("#sku").val();
+            pdetails["qty_stock"] = $("#qty_stock").val();
+            pdetails["qty"] = $("#qty").val();
+            pdetails["list_price"] = $("#list_price").val();
+            pdetails["selling_price"] = $("#selling_price").val();
+            pdetails["discount"] = $("#discount").val();
+            pdetails["net_price"] = $("#net_price").val();
+            console.log(pdetails);
+            if (check_product_exists(pdetails["sku"]) == true){
+                show_error("cart_error", 'This product is already added in Cart !');
+                clear_product_row();
+                return false;
+            };
+            $("#couponCode").prop("disabled", false);
+            add_product_row(pdetails);
+        };
+
+        function check_product_exists(sku){
+            var product_skus = $("#product_table.product_row.sku");
+            for (i=0; i<product_skus.length; i++){
+              window.alert($(product_skus[i]).val());
+                if (sku == $(product_skus[i]).val()){
+                    return true;
+                };
+            };
+        };
+        function add_product_row(pdetails){
+            var new_row = "<tr class=product_row>";
+            new_row += "<td><input readonly class=item_name value='" + pdetails["item_name"] + "'></td>";
+            new_row += "<td style=display:none><input readonly class=sku value=" + pdetails["sku"] + "></td>";
+            new_row += "<td><input readonly class=qty_stock value=" + pdetails["qty_stock"] + "></td>";
+            new_row += "<td><input readonly class=qty value=" + pdetails["qty"] + "></td>";
+            new_row += "<td><input readonly class=list_price value=" + pdetails["list_price"] + "></td>";
+            new_row += "<td><input readonly class=selling_price value=" + pdetails["selling_price"] + "></td>";
+            new_row += "<td><input readonly class=net_price value=" + pdetails["net_price"] + "></td>";
+            new_row += "<td><a class='btn btn-danger' onclick=remove_product(this)><i class='glyphicon glyphicon-trash'></i></a></td></tr>";
+            $("#product_table > tbody tr:last").after(new_row);
+            clear_product_row();
+            attach_price_events();
+            update_cart_price();
+            added_row = $("#product_table > tbody tr:last");
+            return added_row;
+        };
+
+        function clear_product_row(){
+            $("#sku").val('');
+            $("#item_name").val('');
+            $("#selling_price").val('');
+            $("#list_price").val('');
+            $("#qty_stock").val('');
+            $("#qty").val('1');
+            $("#discount").val('0');
+            $("#net_price").val('');
+        };
+
+        function remove_product(link){
+            $(link).closest('tr').remove();
+            update_cart_price();
+        };
+
+        $("#adv_payment").focusout(function(){
+            if ($(this).val().trim() == "" || $.isNumeric($(this).val()) == false || $(this).val() < 0){
+                show_error("cart_error", "Enter valid advance amount");
+                $(this).val(0);
+            }
+            update_cart_price();
+        });
+
+        // $("#save").one('click',function(){
+          
+        //     if ($("#blacklisted").is(':visible') == true){
+        //         alert("Can not create sale order for Blacklisted Customer");
+        //         return false;
+        //     };
+        //     var products = $("#product_table .product_row");
+        //     if (products.length == 0){
+        //         alert("No product is selected for order");
+        //         $("#item_name").focus();
+        //         return false;
+        //     };
+
+        //     if ($("#adv_order").prop('checked') == true && $("#adv_date").val().trim() == ""){
+        //         show_error("order_error", "Please Select Date for advance order");
+        //         $("#adv_date").focus();
+        //         return false;
+        //     };
+
+        //     if ($("#new_address").prop('checked') == true){
+        //         var address_check = check_address_fields();
+        //         if (address_check == false){
+        //             return false;
+        //         };
+        //     };
+
+        //     if ($("#item_name").val() != ""){
+        //         draft = confirm("You have searched for product. Do you want to discard it ?")
+        //         if (draft){
+        //             clear_product_row();
+        //             return false;
+        //         }
+        //         else{
+        //             return false;
+        //         }
+        //     }
+
+        //     payment = $("[name=CashOnDelivery]:checked").val();
+        //     cod_amnt = $("#grand_total").val() - $("#adv_payment").val()
+
+        //     if (payment == "false"){
+        //         if (cod_amnt != 0){
+        //             show_error("cart_error", "COD Amount should be zero for Prepaid Order");
+        //             return false;
+        //         }
+        //     }
+        //     json = ConvertFormToJSON("form");
+            
+        //     if ($("#farmer_id").text() == ""){
+        //         swal("Can't create order without farmer information");
+        //         return false;
+        //     }
+        //     json["FarmerId"] = $("#farmer_id").text();
+        //     if ($("#couponCode").val() != "select") {
+        //         json['couponCode'] = $('#couponCode').val();
+        //     }
+        //     var SaleOrderItems = []
+        //     $("#product_table .product_row").each(function(index, item){
+        //         item = {
+        //             "ItemName": $(item).find('.item_name').val(),
+        //             "ItemSKU": $(item).find('.sku').val(),
+        //             "Discount": $(item).find('.discount').val(),
+        //             "SellingPrice": $(item).find('.selling_price').val(),
+        //             "ListPrice": $(item).find('.list_price').val(),
+        //             "TotalPrice": $(item).find('.net_price').val(),
+        //             "Quantity" : $(item).find('.qty').val()
+        //         }
+        //         SaleOrderItems.push(item);
+        //     });
+        //     json["SaleOrderItems"] = SaleOrderItems;
+        //     if ($("#order_id").text() == ""){
+        //         order_type = 'post';
+        //     }
+        //     else{
+        //         order_type = 'put';
+        //         json['type'] = 'edit';
+        //         json['Code'] = $("#order_id").text();
+        //     }
+            
+        //     console.log(json);
+        //     $.ajax(
+        //     {
+        //         url: "{{order_management_service_url}}" + "saleorder/",
+        //         type: order_type,
+        //         dataType: 'json',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'X-Authorization-Token':"{{request.session.userservice_key}}"
+        //         },
+        //         data: JSON.stringify(json),
+        //         success : function(data)
+        //         {
+        //             if (data.responseData.order_id){
+        //                 window.location = '/crm/salesorder/view/' + data.responseData.order_id;
+        //             }
+        //             console.log(data);
+        //         },
+        //         error : function(data)
+        //         {
+        //             swal("Something Went Wrong !");
+        //         },
+        //     });
+        //     return false;
+        // });
+        
+    </script>
+  {% endblock %}

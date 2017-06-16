@@ -703,6 +703,11 @@
             window.location = currentUrl.replace('/view/', '/edit/')
         };
 
+      function createOrder(){
+            var currentUrl = window.location.href;
+            window.location = currentUrl.replace('/client/view/', '/salesorder/create/')
+        }  
+
       function submitComment(){
             var comment_str = $("#new_comment_text").val().trim();
             if (comment_str == ''){

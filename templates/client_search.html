@@ -18,7 +18,7 @@
         </div>
         <div class="col-md-1">
           <label class="radio-inline">
-            <input name="search_type" type="radio" value="area"><span class="glyphicon glyphicon-globe"></span>Area
+            <input name="search_type" id="area" type="radio" value="area"><span class="glyphicon glyphicon-globe"></span>Area
           </label>
         </div>
         <div class="col-md-3">
@@ -61,6 +61,31 @@
               else{
                 $("#create_new").hide();
                 $("#search_term").val('');
+              }
+            });
+
+            $("#area").change(function(){
+              if (this.checked) {
+                $("#search_term").autocomplete({
+                  source: function(request, response) {
+                    var autocomplete_url = "{{client_service_url}}autocomplete/";
+                    $.ajax({
+                        url: autocomplete_url,
+                        type : "get",
+                        data :{
+                            "type": "area",
+                            "term": request.term,
+                        },
+                        success:function(data){
+                            console.log(data["responseData"]);
+                            response(data["responseData"]);
+                        }
+                    });
+                  },
+                  select: function(event, ui) {
+                    //$("#pin_code").val(ui.item.pin_code);
+                  }
+                });
               }
             });
 
@@ -110,15 +135,15 @@
               console.log("no result");
             }
             else if (result.length == 0){
-                      swal("No farmers found for this query")
+                      swal("No clients found for this query")
             };
             $.each( result, function( index, client ){
                 var row = "<tr>";
                     row += "<td style=vertical-align:middle>" + client.client_id + "</td>";
                     row += "<td style=vertical-align:middle><a href=/erp/client/view/" + client.client_id + ">"+ client.name + "</a></td>";
                     // row += "<td style=vertical-align:middle>" + client.name + "</td>"; 
-                    row += "<td style=vertical-align:middle><a href=''><i class='glyphicon glyphicon-pencil'></i></a></td>";
-                    row += "<td style=vertical-align:middle><a href=''><i class='glyphicon glyphicon-shopping-cart'></i></a></td>";
+                    row += "<td style=vertical-align:middle><a href=/erp/client/edit/" + client.client_id + "><i class='glyphicon glyphicon-pencil'></i></a></td>";
+                    row += "<td style=vertical-align:middle><a href=/erp/salesorder/create/" + client.client_id + "><i class='glyphicon glyphicon-shopping-cart'></i></a></td>";
                     row += "<td style=vertical-align:middle>" + client.order_count + "</td>";
                     row += "<td style=vertical-align:middle>";
                     if (client.mobile){
