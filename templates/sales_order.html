@@ -31,17 +31,18 @@
       #product_table td:last-child{
         width:130px;
       }
+      /*#product_table td:nth-child(2),
       #product_table td:nth-child(3),
       #product_table td:nth-child(4),
       #product_table td:nth-child(5),
       #product_table td:nth-child(6),
       #product_table td:nth-child(7)
       {
-        width:130px;
-      }
-      #summary input{
         width:100px;
-      }
+      }*/
+      /*#summary input{
+        width:100px;
+      }*/
       #int_note{
         width:300px;
         height:60px;
@@ -103,6 +104,7 @@
             <td> MRP </td>
             <td> Unit Selling Price </td>
             <td> Net Price </td>
+            <td> Tax</td>
             <td> Add </td>
           </tr>
           <tr>
@@ -112,12 +114,13 @@
             <td><input id="list_price" name="list_price" class="form-control" readonly></td>
             <td><input id="selling_price" name="selling_price" class="form-control selling_price" readonly></td>
             <td><input id="net_price" name="net_price" class="form-control net_price" readonly></td>
+            <td><input id="gst" name="gst" class="form-control" readonly></td>
             <td><a class="btn btn-success" id="add" onclick=add_product()><i class="glyphicon glyphicon-plus"></i></a></td>
           </tr>
         </thead>
         <tbody>
           <tr style="background:lightblue">
-            <td colspan=7> <span> Products in Cart <i class="glyphicon glyphicon-shopping-cart"></i></span></td>
+            <td colspan=8> <span> Products in Cart <i class="glyphicon glyphicon-shopping-cart"></i></span></td>
           </tr>
           <tr style="background:lightblue"></tr>
         </tbody>
@@ -150,7 +153,7 @@
           <td><b> Order Discount </b></td>
           <td><input id="order_disc_amnt" class="form-control" name="OrderDiscount" value=0></td>
           <td><b> Delivery Charge </b></td>
-          <td><input id="delivery_charge" class="form-control" name="DeliveryCharge" value=0></td>
+          <td><input id="delivery_charge" class="form-control" name="DeliveryCharge" value=0 readonly></td>
           <td><b> Total Discount Percent </b></td>
           <td id="disc_percent"> 0.0 % </td>
           <td><b> Grand Total </b></td>
@@ -218,7 +221,7 @@
 
         <div class="form-group row">
           <div class="col-md-8 text-center">
-            <button id="save" name="save" class="btn btn-large btn-success"> Create Sales Order</button>
+            <input type='button' id="save" name="save" class="btn btn-large btn-success" value="Create Sales Order">
             <button class="btn btn-large btn-danger" type="button" onclick=history.go(-1)> Cancel </button>
           </div>
         </div>
@@ -296,7 +299,7 @@
             $(".ac_catalogue").autocomplete({
                 source: function(request, response){
                     var autocomplete_url = "{{client_service_url}}" + "catalogcomplete/";
-                    $.ajax({
+                     $.ajax({
                         url: autocomplete_url,
                         type:'get',
                         data : {"name": request.term},
@@ -306,20 +309,23 @@
                               availableTags.push(data['responseData'][x]['item_sku']
                                         +'-'+data['responseData'][x]['name']
                                         +'-'+data['responseData'][x]['mrp']
-                                        +'-'+data['responseData'][x]['sellingPrice']);
-                            }           
+                                        +'-'+data['responseData'][x]['sellingPrice']
+                                        +'-'+data['responseData'][x]['gst']);
+                            }         
                             $( "#item_name" ).autocomplete({
                               source: availableTags
                              
                             });
+                        }
                     });
                 },
                 select: function(event, ui) {
                   
                   var values = JSON.stringify(ui.item['value']).split('-');
-                  var mrp = values[2]
-                  var selling_price = values[3].replace('"','')
-                  var sku = values[0]
+                  var mrp = values[2];
+                  var selling_price = values[3].replace('"','');
+                  var sku = values[0];
+                  var gst = values[4].replace('"','');
                     $("#add").prop('disabled', true);
                     //$("#sku").val(sku);
                     $("#item_name").val(ui.item.product_name);
@@ -331,6 +337,7 @@
              
                     var net_price = parseInt(selling_price);
                     $("#net_price").val(net_price);
+                    $("#gst").val(gst);
                     //$("#add").addClass('disabled');
                     //get_inventory(ui.item.sku_code, $("#qty_stock"));
                 },
@@ -340,6 +347,7 @@
                     }
                 }
             });
+          
 
             // $.ajax(
             // {
@@ -371,29 +379,29 @@
             // });
 
             
-            // var salesorderid = currentUrl.split('/')[7];
-            // if (salesorderid && currentUrl.indexOf('edit') != -1){
-            //     $("#order_id").text(salesorderid);
-            //     $.ajax({
-            //         url: "{{order_management_service_url}}" + "saleorder/",
-            //         headers: {'X-Authorization-Token':"{{request.session.userservice_key}}"},
-            //         type: 'get',
-            //         dataType: 'json',
-            //         data : {"Code": salesorderid, "Type":"local"},
-            //         success : function(data)
-            //         {
-            //             if (data.responseData.message == "Invalid Order Code"){
-            //                 alert("We couldn't find this order");
-            //             }
-            //             console.log(data);
-            //             populate_order(data.responseData);
-            //         },
-            //         error : function(data)
-            //         {
-            //             alert("Error in Getting SalesOrder Information");
-            //         },
-            //     });
-            // }
+            var salesorderid = currentUrl.split('/')[7];
+            if (salesorderid && currentUrl.indexOf('edit') != -1){
+                $("#order_id").text(salesorderid);
+                $.ajax({
+                    url: "{{order_management_service_url}}" + "saleorder/",
+                    headers: {'X-Authorization-Token':"{{request.session.userservice_key}}"},
+                    type: 'get',
+                    dataType: 'json',
+                    data : {"Code": salesorderid, "Type":"local"},
+                    success : function(data)
+                    {
+                        if (data.responseData.message == "Invalid Order Code"){
+                            alert("We couldn't find this order");
+                        }
+                        console.log(data);
+                        populate_order(data.responseData);
+                    },
+                    error : function(data)
+                    {
+                        alert("Error in Getting SalesOrder Information");
+                    },
+                });
+            }
 
 
             // $('#item_name').on('autocompletechange change', function () {
@@ -508,39 +516,42 @@
             }
         });
 
-        //  function populate_order(info){
-        //     SaleOrder = info.SaleOrder;
-        //     $("#farmer_id").text(SaleOrder.owner.FarmerId);
-        //     $("[name=BAddressId][value=" + SaleOrder.billing_address.id + "]").prop('checked', true);
-        //     $("[name=SAddressId][value=" + SaleOrder.shipping_address.id +"]").prop('checked', true);
-        //     $("[name=CashOnDelivery][value=" + SaleOrder.cash_on_delivery + "]").prop('checked', true);
-        //     if (SaleOrder.advance_order_date){
-        //         $("#adv_order").prop('checked', true);
-        //         $("#adv_date").prop('disabled', false);
-        //         var adv_date = new Date(SaleOrder.advance_order_date)
-        //         $("#adv_date").datepicker("setDate", adv_date);
-        //     };
-        //     $("#int_note").val(SaleOrder.internal_note);
-        //     $("#order_disc_amnt").val(SaleOrder.order_discount);
-        //     $.each(info.SaleOrderItem, function(index, item){
-        //         var pdetails = {}
-        //         console.log(item.item_name);
-        //         pdetails["item_name"] = item.item_name;
-        //         pdetails["sku"] = item.item_sku;
-        //         pdetails["qty"] = item.quantity;
-        //         pdetails["selling_price"] = item.selling_price;
-        //         pdetails["discount"] = item.discount;
-        //         pdetails["net_price"] = item.total_price;
-        //         pdetails["qty_stock"] = '';
-        //         pdetails["list_price"] = item.list_price;
-        //         prow = add_product_row(pdetails);
-        //     });
-        //     $("#adv_payment").val(SaleOrder.advance_payment);
-        //     $("#adv_pay_note").val(SaleOrder.adv_pay_note);
-        //     $("#cod_amnt").val(SaleOrder.cod_amount);
-        // }
+         function populate_order(info){
+            SaleOrder = info.SaleOrder;
+            $("#client_id").text(SaleOrder.owner.ClientId);
+            $("[name=BAddressId][value=" + SaleOrder.billing_address.id + "]").prop('checked', true);
+            $("[name=SAddressId][value=" + SaleOrder.shipping_address.id +"]").prop('checked', true);
+            $("[name=CashOnDelivery][value=" + SaleOrder.cash_on_delivery + "]").prop('checked', true);
+            if (SaleOrder.advance_order_date){
+                $("#adv_order").prop('checked', true);
+                $("#adv_date").prop('disabled', false);
+                var adv_date = new Date(SaleOrder.advance_order_date)
+                $("#adv_date").datepicker("setDate", adv_date);
+            };
+            $("#int_note").val(SaleOrder.internal_note);
+            $("#order_disc_amnt").val(SaleOrder.order_discount);
+            console.log(info.SaleOrderItem);
+            $.each(info.SaleOrderItem, function(index, item){
+                var pdetails = {}
+                console.log(item.item_name);
+                var item_name = item.item_name.split('-'); 
+                pdetails["item_name"] = item.item_name;
+                pdetails["sku"] = item.item_sku;
+                pdetails["qty"] = item.quantity;
+                pdetails["selling_price"] = item.selling_price;
+                pdetails["discount"] = item.discount;
+                pdetails["net_price"] = item.total_price;
+                pdetails["qty_stock"] = '';
+                pdetails["list_price"] = item.list_price;
+                pdetails["gst"] = item_name[4];
+                prow = add_product_row(pdetails);
+            });
+            $("#adv_payment").val(SaleOrder.advance_payment);
+            $("#adv_pay_note").val(SaleOrder.adv_pay_note);
+            $("#cod_amnt").val(SaleOrder.cod_amount);
+        }
 
-        function attach_price_events(){
+         function attach_price_events(){
             $(".qty").focusout(function() {
                 var row = $(this).closest('tr');
                 var qty = $(this).val().trim();
@@ -627,12 +638,15 @@
             };
             $("#mrp_total").val(mrp_total);
 
+            var net_tax = parseFloat(0).toFixed(2);
             var net_total = parseFloat(0).toFixed(2);
             for (i=0; i<products.length; i++){
                 ind_net = $(products[i]).find('.net_price').val();
+                gst = $(products[i]).find('.gst').val();
                 if (ind_net == undefined){
                     ind_net = 0;
                 };
+                net_tax = (parseFloat(net_tax) + (parseFloat(gst/100) * parseFloat(ind_net))).toFixed(2);
                 net_total = (parseFloat(net_total) + parseFloat(ind_net)).toFixed(2);
             };
             $("#net_total").val(net_total);
@@ -648,15 +662,16 @@
                 disc_percent = 0.0;
             }
             $("#disc_percent").text(disc_percent + "%")
-            grand_total = net_total - parseFloat(order_disc_amnt).toFixed(2);
+            net_total_tax = (parseFloat(net_tax) + parseFloat(net_total)).toFixed(2);
+            grand_total = net_total_tax - parseFloat(order_disc_amnt).toFixed(2);
             //adding delivery charges.
-            if(parseFloat(grand_total).toFixed(2) < 800 && parseFloat(grand_total).toFixed(2)!=0){
-              grand_total = (parseFloat(grand_total) + parseFloat(100)).toFixed(2)
-            }
-            else{
-              delivery_charge = $("#delivery_charge").val();
-              grand_total = (parseFloat(grand_total) + parseFloat(delivery_charge)).toFixed(2);
-            }
+            // if(parseFloat(grand_total).toFixed(2) < 800 && parseFloat(grand_total).toFixed(2)!=0){
+            //   grand_total = (parseFloat(grand_total) + parseFloat(100)).toFixed(2)
+            // }
+            // else{
+            //   delivery_charge = $("#delivery_charge").val();
+            //   grand_total = (parseFloat(grand_total) + parseFloat(delivery_charge)).toFixed(2);
+            // }
             $("#grand_total").val(parseFloat(grand_total).toFixed(2));
             $(".net_price").val(parseFloat(grand_total).toFixed(2));
 
@@ -671,6 +686,8 @@
                 $("#cod_amnt").val(cod_amnt);
             }
         }
+
+
 
         function add_product(){
             if ($("#item_name").val() == ''){
@@ -689,7 +706,8 @@
             pdetails["selling_price"] = $("#selling_price").val();
             pdetails["discount"] = $("#discount").val();
             pdetails["net_price"] = $("#net_price").val();
-            console.log(pdetails);
+            pdetails["gst"] = $("#gst").val();
+            
             if (check_product_exists(pdetails["sku"]) == true){
                 show_error("cart_error", 'This product is already added in Cart !');
                 clear_product_row();
@@ -708,15 +726,17 @@
                 };
             };
         };
+
         function add_product_row(pdetails){
             var new_row = "<tr class=product_row>";
             new_row += "<td><input readonly class=item_name value='" + pdetails["item_name"] + "'></td>";
-            new_row += "<td style=display:none><input readonly class=sku value=" + pdetails["sku"] + "></td>";
+            // new_row += "<td style=display:none><input readonly class=sku value=" + pdetails["sku"] + "></td>";
             new_row += "<td><input readonly class=qty_stock value=" + pdetails["qty_stock"] + "></td>";
             new_row += "<td><input readonly class=qty value=" + pdetails["qty"] + "></td>";
             new_row += "<td><input readonly class=list_price value=" + pdetails["list_price"] + "></td>";
             new_row += "<td><input readonly class=selling_price value=" + pdetails["selling_price"] + "></td>";
             new_row += "<td><input readonly class=net_price value=" + pdetails["net_price"] + "></td>";
+            new_row += "<td><input readonly class=gst value=" + pdetails["gst"] + "></td>";
             new_row += "<td><a class='btn btn-danger' onclick=remove_product(this)><i class='glyphicon glyphicon-trash'></i></a></td></tr>";
             $("#product_table > tbody tr:last").after(new_row);
             clear_product_row();
@@ -735,6 +755,7 @@
             $("#qty").val('1');
             $("#discount").val('0');
             $("#net_price").val('');
+            $("#gst").val('');
         };
 
         function remove_product(link){
@@ -750,110 +771,111 @@
             update_cart_price();
         });
 
-        // $("#save").one('click',function(){
+        $("#save").one('click',function(){
           
-        //     if ($("#blacklisted").is(':visible') == true){
-        //         alert("Can not create sale order for Blacklisted Customer");
-        //         return false;
-        //     };
-        //     var products = $("#product_table .product_row");
-        //     if (products.length == 0){
-        //         alert("No product is selected for order");
-        //         $("#item_name").focus();
-        //         return false;
-        //     };
+            // if ($("#blacklisted").is(':visible') == true){
+            //     alert("Can not create sale order for Blacklisted Customer");
+            //     return false;
+            // };
+            var products = $("#product_table .product_row");
+            if (products.length == 0){
+                swal("No product is selected for order");
+                $("#item_name").focus();
+                return false;
+            };
 
-        //     if ($("#adv_order").prop('checked') == true && $("#adv_date").val().trim() == ""){
-        //         show_error("order_error", "Please Select Date for advance order");
-        //         $("#adv_date").focus();
-        //         return false;
-        //     };
+            if ($("#adv_order").prop('checked') == true && $("#adv_date").val().trim() == ""){
+                show_error("order_error", "Please Select Date for advance order");
+                $("#adv_date").focus();
+                return false;
+            };
 
-        //     if ($("#new_address").prop('checked') == true){
-        //         var address_check = check_address_fields();
-        //         if (address_check == false){
-        //             return false;
-        //         };
-        //     };
+            // if ($("#new_address").prop('checked') == true){
+            //     var address_check = check_address_fields();
+            //     if (address_check == false){
+            //         return false;
+            //     };
+            // };
 
-        //     if ($("#item_name").val() != ""){
-        //         draft = confirm("You have searched for product. Do you want to discard it ?")
-        //         if (draft){
-        //             clear_product_row();
-        //             return false;
-        //         }
-        //         else{
-        //             return false;
-        //         }
-        //     }
+            if ($("#item_name").val() != ""){
+                draft = confirm("You have searched for product. Do you want to discard it ?")
+                if (draft){
+                    clear_product_row();
+                    return false;
+                }
+                else{
+                    return false;
+                }
+            }
 
-        //     payment = $("[name=CashOnDelivery]:checked").val();
-        //     cod_amnt = $("#grand_total").val() - $("#adv_payment").val()
+            payment = $("[name=CashOnDelivery]:checked").val();
+            cod_amnt = $("#grand_total").val() - $("#adv_payment").val()
 
-        //     if (payment == "false"){
-        //         if (cod_amnt != 0){
-        //             show_error("cart_error", "COD Amount should be zero for Prepaid Order");
-        //             return false;
-        //         }
-        //     }
-        //     json = ConvertFormToJSON("form");
+            if (payment == "false"){
+                if (cod_amnt != 0){
+                    show_error("cart_error", "COD Amount should be zero for Prepaid Order");
+                    return false;
+                }
+            }
+            json = ConvertFormToJSON("form");
             
-        //     if ($("#farmer_id").text() == ""){
-        //         swal("Can't create order without farmer information");
-        //         return false;
-        //     }
-        //     json["FarmerId"] = $("#farmer_id").text();
-        //     if ($("#couponCode").val() != "select") {
-        //         json['couponCode'] = $('#couponCode').val();
-        //     }
-        //     var SaleOrderItems = []
-        //     $("#product_table .product_row").each(function(index, item){
-        //         item = {
-        //             "ItemName": $(item).find('.item_name').val(),
-        //             "ItemSKU": $(item).find('.sku').val(),
-        //             "Discount": $(item).find('.discount').val(),
-        //             "SellingPrice": $(item).find('.selling_price').val(),
-        //             "ListPrice": $(item).find('.list_price').val(),
-        //             "TotalPrice": $(item).find('.net_price').val(),
-        //             "Quantity" : $(item).find('.qty').val()
-        //         }
-        //         SaleOrderItems.push(item);
-        //     });
-        //     json["SaleOrderItems"] = SaleOrderItems;
-        //     if ($("#order_id").text() == ""){
-        //         order_type = 'post';
-        //     }
-        //     else{
-        //         order_type = 'put';
-        //         json['type'] = 'edit';
-        //         json['Code'] = $("#order_id").text();
-        //     }
+            if ($("#client_id").text() == ""){
+                swal("Can't create order without client information");
+                return false;
+            }
+            json["ClientId"] = $("#client_id").text();
+            // if ($("#couponCode").val() != "select") {
+            //     json['couponCode'] = $('#couponCode').val();
+            // }
+            var SaleOrderItems = []
+            $("#product_table .product_row").each(function(index, item){
+                item = {
+                    "ItemName": $(item).find('.item_name').val(),
+                    "ItemSKU": $(item).find('.sku').val(),
+                    "Discount": $(item).find('.discount').val(),
+                    "SellingPrice": $(item).find('.selling_price').val(),
+                    "ListPrice": $(item).find('.list_price').val(),
+                    "TotalPrice": $(item).find('.net_price').val(),
+                    "Quantity" : $(item).find('.qty').val(),
+                    "Gst": $(item).find('.gst').val()
+                }
+                SaleOrderItems.push(item);
+            });
+            json["SaleOrderItems"] = SaleOrderItems;
+            if ($("#order_id").text() == ""){
+                order_type = 'post';
+            }
+            else{
+                order_type = 'put';
+                json['type'] = 'edit';
+                json['Code'] = $("#order_id").text();
+            }
             
-        //     console.log(json);
-        //     $.ajax(
-        //     {
-        //         url: "{{order_management_service_url}}" + "saleorder/",
-        //         type: order_type,
-        //         dataType: 'json',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             'X-Authorization-Token':"{{request.session.userservice_key}}"
-        //         },
-        //         data: JSON.stringify(json),
-        //         success : function(data)
-        //         {
-        //             if (data.responseData.order_id){
-        //                 window.location = '/crm/salesorder/view/' + data.responseData.order_id;
-        //             }
-        //             console.log(data);
-        //         },
-        //         error : function(data)
-        //         {
-        //             swal("Something Went Wrong !");
-        //         },
-        //     });
-        //     return false;
-        // });
+            console.log(json);
+            $.ajax(
+            {
+                url: "{{order_management_service_url}}" + "saleorder/",
+                type: order_type,
+                dataType: 'json',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Authorization-Token':"{{request.session.userservice_key}}"
+                },
+                data: JSON.stringify(json),
+                success : function(data)
+                {
+                    if (data.responseData.order_id){
+                        window.location = '/erp/salesorder/view/' + data.responseData.order_id;
+                    }
+                    console.log(data);
+                },
+                error : function(data)
+                {
+                    swal("Something Went Wrong !");
+                },
+            });
+            // return false;
+        });
         
     </script>
   {% endblock %}

@@ -6,9 +6,7 @@
       		<div id="csr">
         		<p id="last_login"></p>
       		</div>
-      		<div>
-      			<div id="chartContainer" style="height: 200px; width: 600;">
-      		</div>
+      		
         	<div class="row">
           		<div class="col-md-12" id="orders_today">
             		<h5 id="count"></h5>
@@ -18,11 +16,11 @@
 	              				<thead>
 	                				<tr>
 		                    			<td  style="display:none">Id</td>
-		                    			<td class="success">SalesOrder Id</td>
-		                    			<td>Farmer</td>
-		                    			<td class="success">Order Items (Quantity)</td>
+		                    			<td class="info">SalesOrder Id</td>
+		                    			<td>Client</td>
+		                    			<td class="info">Order Items (Quantity)</td>
 		                    			<td>Grand Total</td>
-		                    			<td class="success">Created On</td>
+		                    			<td class="info">Created On</td>
 		                    			<td>Status</td>
 		                   				<td>Edit</td>
 		                    		</tr>
@@ -47,113 +45,89 @@
     	
 	</div>
     	<script type="text/javascript">
-    		// var order_details;
-      //  		$(document).ready(function(){
-      //  			if("{{user}}" == 'operations'){
-      //  				$("#operation_menu").show();
-      //  			}
-      //  			else{
-      //  				$("#operation_menu").hide();
-      //  			}
-      //       	localStorage.setItem("crm_service_url", "{{crm_service_url}}");
-      //       	var loc = window.location.href; 
+    		var order_details;
+       		$(document).ready(function(){
+       			// if("{{user}}" == 'operations'){
+       			// 	$("#operation_menu").show();
+       			// }
+       			// else{
+       			// 	$("#operation_menu").hide();
+       			// }
             	
-      //       	$.ajax(
-		    //     {
-		    //         url: "{{crm_service_url}}" + "csrdetails/",
-		    //         headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}"},
-		    //         type: 'get',
-		    //         dataType: 'json',
-		    //         success : function(data)
-		    //         {
+            	var loc = window.location.href; 
+            	
+            	$.ajax(
+		        {
+		            url: "{{client_service_url}}" + "csrdetails/",
+		            headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}"},
+		            type: 'get',
+		            dataType: 'json',
+		            success : function(data)
+		            {
 		              
-		    //             if (data.responseData.info){
-		    //                 populate_info(data.responseData.info);
-		    //             	var chart = new CanvasJS.Chart("chartContainer",{			
-						// 				title: {
-						// 				text: "Order Statistics"		
-						// 				},
-						// 				legend :{
-						// 					verticalAlign: 'bottom',
-						// 					horizontalAlign: "center"
-						// 				},
-						// 				dataPointWidth: 50,
-						// 				data: [
-						// 				{
-						// 					type: "column",	
-						// 					bevelEnabled: true,				
-						// 					indexLabel: "{y}",
-						// 					dataPoints: [
-						// 						{ y: data.responseData.info.orders_count, label: "Today's Order" },
-						// 						{ y: data.responseData.info.orders_yesterday, label: "Yesterday's Order" },
-						// 						{ y: data.responseData.info.orders_this_month, label: "This Month" },
-						// 						{ y: data.responseData.info.orders_last_month, label: "Last Month" },
-						// 					]					
-						// 				}
-						// 			]
-						// 		});
-						// 	chart.render();
-		    //             }
+		                if (data.responseData.info){
+		                    populate_info(data.responseData.info);
+		                }
 
-		    //            	order_details= data;
-						// console.log(data);
-		    //         },
-		    //         error : function(data)
-		    //         {
-		    //             alert("Error in Getting CSR Information");
-		    //         },
-		    //     });
-      //       });
+		               	order_details= data;
+						console.log(data);
+		            },
+		            error : function(data)
+		            {
+		                alert("Error in Getting CSR Information");
+		            },
+		        });
+            });
 
        		
 
-      //   	function populate_info(info){
-      //       	$("#csr").html("<h4><b>Welcome,  " + info.Customer + "</b></h4><h4><b>Last Login: "+ info.last_login +"</b></h4>");
-      //       	var counts = "<b>Order Statistics : Today - " + info.orders_count;
-      //       	counts += ", Yesterday - " + info.orders_yesterday;
-      //       	counts += ", This Month - " + info.orders_this_month;
-      //       	counts += ", Last Month - " + info.orders_last_month;
-      //       	counts += "</b>"
-      //       	$("#count").html(counts);
-      //       	var row = ""
+        	function populate_info(info){
+            	$("#csr").html("<h4><b>Welcome,  " + info.Customer + "</b></h4><h4><b>Last Login: "+ info.last_login +"</b></h4>");
+            	var counts = "<b>Order Statistics : Today - " + info.orders_count;
+            	counts += ", Yesterday - " + info.orders_yesterday;
+            	counts += ", This Month - " + info.orders_this_month;
+            	counts += ", Last Month - " + info.orders_last_month;
+            	counts += "</b>"
+            	$("#count").html(counts);
+            	var row = ""
        			
-      //  			$.each(info.orders_today, function(index, order){
-	     //            var order_item='';
-	     //            for(i=0;i<order['orderitems'].length;i++){
-	     //              order_item+="<h5>"+(i+1)+") "+order['orderitems'][i]+" ("+order['quantity'][i]+")</h5>";
-	     //            }
-	     //            row += "<tr>"
-	     //            row += "<td style='display:none'>" + (index+1) + "</td>"
-	     //            row += "<td><a href=/crm/salesorder/view/" + order.sales_order_id + ">" + order.sales_order_id + "</a></td>"
-	     //            row += "<td><a href=/crm/farmer/view/" + order.farmer + ">" + order.farmer_name + "</a></td>"
-	     //            row += "<td>"+order_item+"</td>"
-	     //            row += "<td>" + order.grand_total + "</td>"
-	     //            row += "<td>" + order.created_on + "</td>"
-	     //            row += "<td class=" + order.status.toLowerCase() + ">" + order.status + "</td>"
-	     //            row += "<td><button type='button' class ='btn btn-primary edit_order' onclick='javascript:edit_info(&quot;"+index+"&quot)'>Edit</button></td> " 
-	     //            row += "</tr>"
-	     //        });
-      //       	$("#order_table > tbody").append(row);
-      //       	$('#order_table').DataTable({
-      //           	"order": [[ 0, "asc" ]]
-      //       	});
-      //       	var row = ""
-      //       	$.each(info.advance_orders, function(index, adv_order){
-      //           	row += "<tr>"
-      //           	row += "<td><a href=/crm/salesorder/view/" + adv_order.sales_order_id + ">" + adv_order.sales_order_id + "</a></td>"
-      //           	row += "<td>" + adv_order.advance_order_date + "</td>"
-      //           	row += "</tr>"
-      //       	});
-      //       	$("#adv_order_table > tbody tr:last").after(row);
-      //       	$("#adv_count").text(info.advance_orders.length);
-      //   	}
+       			$.each(info.orders_today, function(index, order){
+	                var order_item='';
+	                for(i=0;i<order['orderitems'].length;i++){
+	                  order_item+="<h5>"+(i+1)+") "+order['orderitems'][i]+" ("+order['quantity'][i]+")</h5>";
+	                }
+	                row += "<tr>"
+	                row += "<td style='display:none'>" + (index+1) + "</td>"
+	                row += "<td><a href=/erp/salesorder/view/" + order.sales_order_id + ">" + order.sales_order_id + "</a></td>"
+	                row += "<td><a href=/erp/client/view/" + order.client + ">" + order.client_name + "</a></td>"
+	                row += "<td>"+order_item+"</td>"
+	                row += "<td>" + order.grand_total + "</td>"
+	                row += "<td>" + order.created_on + "</td>"
+	                row += "<td class=" + order.status.toLowerCase() + ">" + order.status + "</td>"
+	                row += "<td><button type='button' class ='btn btn-primary edit_order' onclick='javascript:edit_info(&quot;"+index+"&quot)'>Edit</button></td> " 
+	                row += "</tr>"
+	            });
+            	$("#order_table > tbody").append(row);
+            	$('#order_table').DataTable({
+                	"order": [[ 0, "asc" ]]
+            	});
+            	var row = ""
+            	$.each(info.advance_orders, function(index, adv_order){
+                	row += "<tr>"
+                	row += "<td><a href=/erp/salesorder/view/" + adv_order.sales_order_id + ">" + adv_order.sales_order_id + "</a></td>"
+                	row += "<td>" + adv_order.advance_order_date + "</td>"
+                	row += "</tr>"
+            	});
+            	$("#adv_order_table > tbody tr:last").after(row);
+            	$("#adv_count").text(info.advance_orders.length);
+        	}
 
-	     //    function edit_info(index_count){
-	     //    	details = order_details.responseData.info.orders_today[index_count];
-	     //     	order_id = details.sales_order_id;
-	     //     	farmer_id = details.farmer;
-	     //     	window.location = '/crm/salesorder/edit/?farmerid=' + farmer_id + '&orderid=' + order_id;
-	     //    }
+	        function edit_info(index_count){
+	        	details = order_details.responseData.info.orders_today[index_count];
+	         	order_id = details.sales_order_id;
+	         	client_id = details.client;
+	         	window.location = '/erp/salesorder/edit/?clientid=' + client_id + '&orderid=' + order_id;
+	        }
     </script>
    {% endblock %}
    

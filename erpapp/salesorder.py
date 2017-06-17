@@ -8,12 +8,12 @@ from django.contrib.auth.decorators import (
 import json
 from django.conf import settings
 
-# @login_required
-# def search_salesorder(request):
-#     return render_to_response(
-#         "order_search.html",
-#         RequestContext(request)
-#     )
+@login_required
+def search_salesorder(request):
+    return render_to_response(
+        "order_search.html",
+        RequestContext(request)
+    )
 
 # @login_required
 # def calls(request):
@@ -36,12 +36,12 @@ def create_salesorder(request):
         RequestContext(request)
     )
 
-# @login_required
-# def view_salesorder(request):
-#     return render_to_response(
-#         "sales_order_view.html",
-#         RequestContext(request)
-#     )
+@login_required
+def view_salesorder(request):
+    return render_to_response(
+        "sales_order_view.html",
+        RequestContext(request)
+    )
 
 # @login_required
 # @user_passes_test(lambda u: u.groups.filter(name='operations').exists())

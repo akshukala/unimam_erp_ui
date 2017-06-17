@@ -556,28 +556,28 @@
             // }
             // $("#related_farmers").html(related_data);
             
-            // if (info.orders.length > 0){
-            //     $("#no_orders").hide();
-            //     $("#order_history").show();
-            //     $.each(info.orders, function(index, order){
-            //         var order_row = "<tr>";
-            //         order_row += "<td><a href=/crm/salesorder/view/" + order.sales_order_id + ">" + order.sales_order_id + "</a></td>";
-            //         order_row += "<td>" + ( order.entered_by || '' ) + "</td>";
-            //         order_row += "<td>" + order.created_on + "</td>";
-            //         order_row += "<td>" + order.total_discount + "</td>";
-            //         order_row += "<td>" + order.grand_total + "</td>";
-            //         order_row += "<td>" + order.advance_payment + "</td>";
-            //         order_row += "<td>" + order.cod_amount + "</td>";
-            //         order_row += "<td>" + order.status + "</td>";
-            //         order_row += "</tr>";
-            //         $("#order_history > tbody").append(order_row);
-            //     });
-            //     $("#order_count").html(" ( Total : " + info.order_count + ", Last Order : " + info.last_active + ")");
-            //     $("#order_history").DataTable({
-            //         "order": [[ 0, "desc" ]],
-            //         "autoWidth": false
-            //     });
-            // };
+            if (info.orders.length > 0){
+                $("#no_orders").hide();
+                $("#order_history").show();
+                $.each(info.orders, function(index, order){
+                    var order_row = "<tr>";
+                    order_row += "<td><a href=/erp/salesorder/view/" + order.sales_order_id + ">" + order.sales_order_id + "</a></td>";
+                    order_row += "<td>" + ( order.entered_by || '' ) + "</td>";
+                    order_row += "<td>" + order.created_on + "</td>";
+                    order_row += "<td>" + order.total_discount + "</td>";
+                    order_row += "<td>" + order.grand_total + "</td>";
+                    order_row += "<td>" + order.advance_payment + "</td>";
+                    order_row += "<td>" + order.cod_amount + "</td>";
+                    order_row += "<td>" + order.status + "</td>";
+                    order_row += "</tr>";
+                    $("#order_history > tbody").append(order_row);
+                });
+                $("#order_count").html(" ( Total : " + info.order_count + ", Last Order : " + info.last_active + ")");
+                $("#order_history").DataTable({
+                    "order": [[ 0, "desc" ]],
+                    "autoWidth": false
+                });
+            };
             populate_call_history(info.call_history);
           }
         function populate_call_history(data){

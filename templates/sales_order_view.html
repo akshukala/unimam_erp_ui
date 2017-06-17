@@ -1,0 +1,314 @@
+    {% extends 'base.html' %}
+    {% load staticfiles %}
+    {% block content %}
+    
+    <style type="text/css">
+        li:hover {
+          background-color: #C8C8C8 ;
+        }
+        a:hover{background-color:white;}
+          img {
+            width: 120px;
+            height:30px;
+        }
+        table {
+            font-size: 13px;
+            table-layout:fixed;
+        }
+        .table-striped-column > tbody > tr td:nth-of-type(odd) {
+            background-color: #E9F0E9;
+        }
+        .table-striped-column td:nth-child(odd) {
+            background-color: #E9F0E9;
+        }
+        td input{
+            text-align:center;
+        }
+        #product_table input{
+            width:100%
+        }
+       
+        #product_table td:first-child{
+            width:360px;
+        }
+        /*#product_table td:nth-child(3),
+        #product_table td:nth-child(4),
+        #product_table td:nth-child(6),
+        #product_table td:nth-child(7){
+            width:195px;
+        }*/
+        .actions {
+            padding:10px;
+        }
+        
+        a:hover {
+            cursor:pointer;
+        }
+        
+
+    </style>
+
+		<div class="col-md-8 actions" style="margin-top:60px;">
+        <input id="cancel"  class="btn btn-danger actions" type="button" value="Cancel This Order">
+        <input id="edit_order"  class="btn btn-warning actions" type="button" value="Edit This Order">
+    </div>
+    <div class="container" style="margin-top:80px;">
+      <table id="client_table" class="table table-striped-column table-bordered text-center vcenter">
+        <tr>
+          <td> SalesOrder Id </td>
+          <td id="sales_order_id"> </td>
+          <td> Name </td>
+          <td id="name"></td>
+          <td> Client Id </td>
+          <td id="client_id"></td>
+        </tr>
+        <tr>
+          <td> Order Status </td>
+          <td id="status"> </td>
+          <td> Created On </td>
+          <td id="created_on"> </td>
+          <td> Last Updated </td>
+          <td id="updated_on"> </td>
+        </tr>
+        <tr>
+          <td> Payment Mode </td>
+          <td id="payment"> </td>
+          <td> Advance Order Date </td>
+          <td id="advance_order_date"></td>
+          <td> Advance Payment </td>
+          <td id="advance_payment"></td>
+        </tr>
+        <tr>
+          <td> Contact Numbers </td>
+          <td id="contact"></td>
+          <td> Internal Note </td>
+          <td id="internal_note"></td>
+          <td> Adv. Pay Note </td>
+          <td id="adv_pay_note"></td>
+        </tr>
+        <tr>
+          <td> Billing Address </td>
+          <td colspan=2 id="billing_address"></td>
+          <td> Shipping Address </td>
+          <td colspan=2 id="shipping_address"></td>
+        </tr>
+      </table>
+      <b> Tracking Details</b>
+      </br>
+      <div class="table-responsive">
+        <table id="order_history_table" class="table table-bordered text-center vcenter">
+          <thead>
+            <tr style="background-color: silver;">
+              <td> Status</td>
+              <td> Date </td>
+            </tr>
+          </thead>
+          <tbody id="order_history_body">
+          </tbody>
+        </table>
+      </div>
+          
+      <div class="row">
+        <div class="col-md-12 panel panel-heading"> <b>Products Details</b> </div>
+      </div>
+      <div class="table-responsive">
+        <table id="product_table" class="table table-bordered text-center vcenter">
+          <tbody>
+            <tr style="background-color: silver;">
+              <td> Item Name </td>
+              <td> Quantity </td>
+              <td> Unit Selling Price </td>
+              <td> Unit Prepaid Amount </td>
+              <td> Net Price </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan=3></td>
+              <td colspan=1><b> Order Discount </b></td>
+              <td colspan=1 id="order_discount"></td>
+            </tr>
+            <tr>
+              <td colspan=3></td>
+              <td colspan=1><b> Grand Total </b></td>
+              <td colspan=1 id="grand_total"></td>
+            </tr>
+            <tr>
+              <td colspan=3></td>
+              <td colspan=1><b> Total Prepaid Amount </b></td>
+              <td colspan=1 id="prepaid_amount"></td>
+            </tr>
+            <tr>
+              <td colspan=3></td>
+              <td colspan=1><b> COD Amount </b></td>
+              <td colspan=1 id="cod_amount"></td>
+            </tr>
+
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- <script src="{% static 'js/autocomplete.js' %}"></script> -->
+    <script type="text/javascript">
+
+    $(document).ready(function (){
+        var currentUrl = window.location.href;
+        url_id = currentUrl.split('/view/')
+        
+        $.ajax({
+            url: "{{order_management_service_url}}" + "saleorder/",
+            headers: {'X-Authorization-Token':"{{request.session.userservice_key}}"},
+            type: 'get',
+            dataType: 'json',
+            async: false,
+            data : {"Code": url_id[1]},
+            success : function(data)
+            {
+                if (data.responseData.Message == "Invalid Order Code"){
+                    swal("We couldn't find this order");
+                    $(".actions").prop('disabled', true);
+                }
+                console.log(data);
+                if (data.responseData.SaleOrder){
+                    populate_info(data.responseData);
+                }
+                else{
+                    alert("Error in getting Order details");
+                }
+            },
+            error : function(data)
+            {
+                alert("Error in Getting SalesOrder Information");
+            },
+        });
+
+    });
+
+    function populate_info(data){
+        var SaleOrder = data.SaleOrder;
+        var SaleOrderItem = data.SaleOrderItem;
+        var TrackingInformation = data.TrackingInformation;
+        var SaleOrderHistory = data.SaleOrderHistory;
+        
+        $("#client_id").text(SaleOrder.owner.ClientId);
+        $("#sales_order_id").text(SaleOrder.sales_order_id);
+        $("#name").html("<a href=/erp/client/view/" + SaleOrder.owner.ClientId + ">" + SaleOrder.owner.Name + "</a>");
+        $("#status").text(SaleOrder.status);
+        
+        if(SaleOrderHistory.length > 0){
+          var order_history_row = '';
+          $.each(SaleOrderHistory, function(index,orderHistory){
+              
+              order_history_row += "<tr>";
+              order_history_row += "<td>" + orderHistory.status + "</td>";
+              temp = orderHistory.created_on.split('T');
+              created_date = temp[0] + " " + temp[1].split('.')[0];
+              order_history_row += "<td>" + created_date + "</td>";
+              order_history_row += "</tr>";
+
+          });
+          $("#order_history_table > tbody").html(order_history_row);
+          // if(SaleOrder.status=="DISPATCHED" || SaleOrder.status=='ORDER COMPLETED' || SaleOrder.status=='RETURN COMPLETED'){
+          //   $("#tracking_link").show();
+           
+          //   var tracking_div_id = document.getElementById("tracking_link");
+          //   var aTag = document.createElement('a');
+          //   var track_url='https://track.aftership.com/india-post/'+data.IndiaPostBarcode;
+          //   aTag.setAttribute('href',track_url);
+          //   aTag.setAttribute('class','btn btn-primary');
+          //   aTag.setAttribute('target', '_blank');
+          //   aTag.innerHTML = "Package Tracking";
+          //   tracking_div_id.appendChild(aTag);
+            
+          // }
+        }
+        var mobile_nos ='';
+        for(i=0;i<SaleOrder.notification_mobile.length;i++){
+          mobile_nos += SaleOrder.notification_mobile[i] + " |";
+        }
+        $("#contact").text(mobile_nos);
+        $("#internal_note").text(SaleOrder.internal_note);
+        $("#adv_pay_note").text(SaleOrder.adv_pay_note);
+
+        $("#created_on").html(SaleOrder.created_on + "<br> by " + SaleOrder.entered_by_csr);
+        $("#updated_on").html(SaleOrder.updated_on + "<br> by " + SaleOrder.modified_by_csr);
+        $("#advance_order_date").text(SaleOrder.advance_order_date);
+
+        if (SaleOrder.cash_on_delivery){
+            $("#payment").text("COD");
+        }
+        else {
+            $("#payment").text("Prepaid");
+        }
+        $("#advance_payment").text(SaleOrder.advance_payment);
+
+        var bjson = SaleOrder.billing_address;
+        billing_address_str = bjson.AddressLine1 + ' - ' + bjson.AddressLine2 + ' ';
+        billing_address_str += bjson.City + ' - ' + bjson.State + ' - ' + bjson.Pincode;
+        $("#billing_address").html(billing_address_str);
+
+        var sjson = SaleOrder.shipping_address;
+        shipping_address_str = sjson.AddressLine1 + ' - ' + sjson.AddressLine2 + ' ';
+        shipping_address_str += sjson.City + ' - ' + sjson.State + ' - ' + sjson.Pincode;
+        $("#shipping_address").html(shipping_address_str);
+
+        $.each(SaleOrderItem, function(index, item){
+            var row = "<tr>"
+            row += "<td>" + item.item_name + "</td>"
+            row += "<td style=display:none>" + item.item_sku + "</td>"
+            row += "<td>" + item.quantity + "</td>"
+            row += "<td>" + item.selling_price + "</td>"
+            row += "<td style=display:none>" + item.adj_discount + "</td>"
+            row += "<td>" + item.prepaid_amount + "</td>"
+            row += "<td>" + item.total_price + "</td>";
+            row += "</td>" + 0 + "</td>";
+            $("#product_table > tbody tr:last").after(row);
+        })
+        $("#order_discount").text(SaleOrder.order_discount);
+        $("#total_discount").text(SaleOrder.total_discount);
+        $("#grand_total").text(SaleOrder.grand_total);
+        $("#prepaid_amount").text(SaleOrder.advance_payment);
+        $("#cod_amount").text(SaleOrder.cod_amount);
+
+        previous_url = document.referrer
+        if (previous_url && previous_url.indexOf('/salesorder/create/') != -1){
+            $("#update").click();
+        }
+    };
+
+    $("#cancel").click(function(){
+        var json = {"Code": $("#sales_order_id").text(), "type": "cancel"};
+        $.ajax(
+        {
+            url: "{{order_management_service_url}}" + "saleorder/",
+            type: 'put',
+            dataType: 'json',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Authorization-Token':"{{request.session.userservice_key}}"
+            },
+            data: JSON.stringify(json),
+            success : function(data)
+            {
+                console.log(data);
+                if (data.responseData.Message == "Cancelled"){
+                    location.reload();
+                };
+            },
+            error : function(data)
+            {
+                alert("Something Went Wrong !");
+            },
+        });
+    });
+
+    $("#edit_order").click(function(){
+        var currentUrl = window.location.href;
+        var order = $("#sales_order_id").text();
+        var client = $("#client_id").text();
+        window.location = currentUrl.replace('/view/'+order, '/edit/'+client+'/'+order);
+    });
+
+    </script>
+ {% endblock %}

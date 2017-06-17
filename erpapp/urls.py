@@ -9,5 +9,8 @@ urlpatterns = [
     url(r'^client/view/', client.view_client),
     url(r'^client/schedule_calls/', scheduling.call_scheduling),
     url(r'^salesorder/create/', salesorder.create_salesorder),
+    url(r'^salesorder/view/', salesorder.view_salesorder),
+    url(r'^salesorder/edit/', salesorder.create_salesorder),
+    url(r'^salesorder/search/', salesorder.search_salesorder),
     url(r'^catalog/view/', catalog.view_catalog),
 ]
