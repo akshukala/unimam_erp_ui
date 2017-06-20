@@ -22,6 +22,29 @@
           </div>
         </div>
       </div>
+      <br>
+        <div class="row text-center">
+          <form method="get" action="{{ order_management_service_url }}reports/">
+              <div class="col-md-3">
+                <div class="left">
+                    <p>From Date: <input format="yyyy-MM-dd" id="from_date" name="from_date"></p>
+                </div>
+              </div>
+              <div class="col-md-3">
+                  <div class="right">
+                      <p>To Date: <input format="yyyy-MM-dd" id="to_date" name="to_date"></p>
+                  </div>
+              </div>
+              <div class="col-md-3">
+                  <button type="submit" id="generateExcel" class="btn btn-primary">Download</button>
+              </div>
+            </form>
+          </div>
+
+           <!--  <div class="col-md-3">
+                <input type="submit" id="show_logs_by_date" class="btn btn-primary" value="Download"/>
+            </div>   -->   
+        </div>
     <br>
     <br>
         <div class="tab-content no-padding">
@@ -83,7 +106,11 @@
                 });
 
         $('#search_village').on('change', function () {
+
+        	// $( "#search_village" ).click(function() {
+
                     var value = $(this).val();
+                    alert(value);
                     $.ajax(
                     {
                       type:'get',
@@ -99,6 +126,8 @@
                         else{
                               result = data;  
                             }
+                        console.log(result);
+                        alert("Hiii");
                         $("#search_results").show();    
                         t.rows().remove().draw();
                         populate_table(result);
@@ -152,7 +181,52 @@
                             var row = $('#search_results').dataTable().fnGetNodes(rowIndex);
                             $(row).attr('id', result[i]['id']);
                     }
-            }    
+            }
+
+
+               // serach by date
+                // $("#from_date").datepicker();
+                $("#from_date").datepicker({ dateFormat: 'yy-mm-dd' });                
+                $("#to_date").datepicker({ dateFormat: 'yy-mm-dd' });
+                // $("#to_date").datepicker();
+                var button_my_button = "#show_logs_by_date";
+                $(button_my_button).click(function(){
+                    var fromdate = $("#from_date").val();
+                    var todate = $("#to_date").val();
+                    if (fromdate === "" || todate === "") {
+                        alert("Please select from date and to date.");
+                    } else {
+                         var value = $("#search_village").val();
+                    alert(value);
+                    $.ajax(
+                    {
+                      type:'get',
+                      url: "{{order_management_service_url}}" + "reports/?text_data="+value+"&from_date="+fromdate+"&to_date="+todate+"&type=area",
+                      headers: {'content_type':'application/json','X-Authorization-Token' : "{{request.session.userservice_key}}"},
+                      dataType: 'json',
+                      success : function(data)
+                      {
+                        console.log(data);
+                        if(data['responseData']){
+                            result = data['responseData'];
+                            }
+                        else{
+                              result = data;  
+                            }
+                        console.log(result);
+                        alert("Hiii");
+                        $("#search_results").show();    
+                        t.rows().remove().draw();
+                        populate_table(result);
+                      },
+                      error : function(error)
+                      {
+                        window.alert(error);
+                        console.log(error);
+                      },
+                    });
+                    }
+                });    
 
             
         </script>
