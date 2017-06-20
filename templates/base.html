@@ -42,9 +42,11 @@
                         		<li><a href="/erp/salesorder/search/"><strong>Orders</strong></a></li>
                         		<!-- <li><a href="/erp/salesorder/calls/"> <strong>Manage Calls</strong></a></li> -->
                             <li><a href="/erp/client/schedule_calls/"> <strong>Scheduled Calls</strong></a></li>
-                            {% if operation_user %}
-            						      <li id="operation_menu"><a href="/operational_dashboard/"> <strong>Operations</strong> </a></li>
-          						      {% endif %}
+                            <li><a href="/operations/"> <strong>Operations</strong> </a></li>
+                            <li><a href="/warehouse/"> <strong>Warehouse</strong> </a></li>
+                            <!-- {% if operation_user %} -->
+            						    
+          						      <!-- {% endif %} -->
           						      {% for group in user.groups.all %}
                               {% if group.name == 'csrlead' %}
                                 <li><a href="/operational_dashboard/"> <strong>Operations</strong> </a></li>

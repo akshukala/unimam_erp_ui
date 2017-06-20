@@ -1,0 +1,86 @@
+<html>
+    <head>
+        {% load staticfiles %}  
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.theme.min.css" />
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="{% static 'js/jquery-ui-1.11.4.min.js' %}"></script>
+        <script src="https://cdn.jsdelivr.net/jsbarcode/3.3.14/JsBarcode.all.min.js"></script>
+        <style>
+            p.pic {
+                    width: 160px;
+                    margin: 0 auto;
+                    }
+            .borderless tr td {
+                    border: none !important;
+                    padding: 0px !important;
+                    }
+            .borderline{
+                    border-bottom:2px solid black;
+                    }   
+                    
+            .groove {border-style: groove;}
+            table {border-collapse: collapse;}
+            #gross_total{
+                border-collapse: collapse;
+                
+            }
+            .borders{
+                 border: 1px solid black;
+            }
+
+        </style>
+    </head>
+
+    <body class="groove">
+        <script type="text/javascript">
+            $(document).ready(function(){
+                var currentUrl = window.location.href;
+                var temp = currentUrl.split('?');
+                var url_data = temp[1].split("!");
+                var delivery_by = url_data[2];
+                var order_id = url_data[3];
+                var barcodes = (url_data[0].split('$')).slice(0, -1);
+                var quantity = (url_data[1].split('#')).slice(0, -1);
+
+                $.ajax(
+                      {
+                            type: 'post',
+                            url: "{{warehouse_service_url}}"+"invoice/",
+                            headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}"},
+                            dataType: 'json',
+                            data: JSON.stringify({
+                                                    'order_id': order_id,
+                                                    'barcodes': barcodes,
+                                                    'quantity': quantity,
+                                                    'delivery_by': delivery_by   
+                                                    }),
+                            success : function(data)
+                            {
+                                console.log(data);
+                                if(data['responseData']){
+                                    result = data['responseData'];
+                                }
+                                else{
+                                    result = data;  
+                                }
+                              // swal({
+                              //   title: "Success!!!",
+                              //   text: result['responseData'],
+                              //   type: "success",
+                              //  },
+                              // function(){
+                              //   location.reload();
+                              // });
+                            },
+                            error : function(error)
+                            {
+                                window.alert(error);
+                            },
+                        });
+            });
+        </script>
+    </body>
+</html>

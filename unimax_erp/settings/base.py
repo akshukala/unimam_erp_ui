@@ -38,6 +38,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'erpapp',
+    'operations',
+    'warehouse',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -116,3 +118,5 @@ UNI_HOST = "http://127.0.0.1:8000/"
 USER_SERVICE_URL = 'http://0.0.0.0:7281/'
 CLIENT_SERVICE_URL = 'http://0.0.0.0:7283/'
 ORDER_MANAGEMENT_SERVICE_URL = 'http://0.0.0.0:7285/'
+OPERATION_SERVICE_URL = 'http://0.0.0.0:7287/'
+WAREHOUSE_SERVICE_URL = 'http://0.0.0.0:7289/'

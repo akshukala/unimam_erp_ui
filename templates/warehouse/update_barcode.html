@@ -1,0 +1,144 @@
+<html>
+	<head>
+		{% load staticfiles %}
+		<title> Unimax|Warehouse</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- <link rel="icon" type="image/png" sizes="96x96" href="{% static 'images/krishi_favicon.png' %}"/> -->
+		<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}" />
+		<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+		<link rel="stylesheet" href="{% static 'css/menubar_style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/sweetalert.css' %}">
+    <style>
+      #loading-indicator {
+        position: absolute;
+        left: 550px;
+        top: 60px;
+      }
+      tr.highlight td {
+        background: silver;
+      }
+    </style> 
+
+		<script src="{% static 'js/jquery-1.11.3.min.js' %}"></script>
+		<script src="{% static 'js/bootstrap.min.js' %}"></script>
+		<script src="{% static 'js/jquery-ui-1.11.4.min.js' %}"></script>
+    <script src="{% static 'js/common.js' %}"></script>
+    <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/sweetalert.min.js' %}"></script>	
+  </head>
+	<body>
+		<div class="navbar-wrapper">
+    		<div class="container-fluid">
+        		<nav class="navbar navbar-fixed-top">
+            		<div class="container">
+                		<div class="navbar-header">
+                    		<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+          						    <span class="icon-bar"></span>
+          						    <span class="icon-bar"></span>
+          						    <span class="icon-bar"></span>                        
+      						      </button>
+                    		<a class="navbar-brand" href="/erp/"><img src="{% static 'images/logo-uni.png' %}" align="left" height="40px" width="150px" style="margin-top:-5px;" class="img-responsive"></a>
+                		</div>
+                		<div id="navbar" class="navbar-collapse collapse">
+                    		<ul class="nav navbar-nav">
+                        	<li><a id="warehouse_url" href="/warehouse/"> <strong>Warehouse (Orders To Pack)</strong></a></li>
+                          <li class="active"><a id="update_barcode_url" href="/warehouse/update_barcode/"> <strong>Update Barcode </strong></a></li>
+                          <!-- <li><a id="product_url" href="/erp/catalog/view"><strong>Products</strong></a></li> -->
+                          <!-- <li><a href="/operational_dashboard/stock/" id="stock"><strong>Stock/CP</strong></a></li>
+                          <li><a href=/operational_dashboard/after_dispatch> <strong>After Dispatch Status</strong></a></li> -->
+          						
+          						  </ul>
+                    		<ul class="nav navbar-nav pull-right">
+                        		<li><a href="/logout/"><strong><span class="glyphicon glyphicon-log-out"></span>Logout</strong></a></li>
+                    		</ul>
+                		</div>
+            		</div>
+        		</nav>
+    		</div>
+		</div>
+
+    <br>
+    <br>
+    <div class="container-fluid">
+      <br><br>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="table-responsive"> 
+            <table id="product_stk_table" class="table table-striped table-bordered text-center vcenter table-responsive">
+                <col width="200">
+                <col width="100">
+                <col width="100">
+                <col width="100">
+                <tr>
+                  <td>Product Name</td>
+                  <td>Price </td>
+                  <td>Quantity</td>
+                  <td>Update </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="form-group">
+                      <label for="selectProduct"></label>
+                        <select class="form-control" name="selectProduct" id="selectProduct">
+                          <option value="Select">Select</option>
+                        </select>
+                    </div>
+                  </td>
+                  <td id='selling_price'></td>
+                  <td><input id='quantity' name="quantity" type='number' class='form-control'/></td>
+                  <td><button id='update_btn' class="btn btn-primary">Update</button></td>
+                </tr>
+            </table>
+             
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      $(document).ready(function(){
+        var result;
+        $.ajax(
+            {
+                type:'get',
+                url: '{{ warehouse_service_url }}'+'products/',
+                headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}"},
+                dataType: 'json',
+                
+                success : function(data)
+                {
+                  console.log(data);
+                  if(data['responseData']){
+                    result = data['responseData'];
+                  }
+                  else{
+                    result = data;  
+                  }
+                   
+                  for(j=0;j<result.length;j++)
+                  {
+                    var valueData=result[j]['selling_price']+'_'+result[j]['productName']+'_'+result[j]['product_id'];
+                    var newOption = $('<option value="'+valueData+'">'+result[j]['productName']+'</option>');
+                    $('#selectProduct').append(newOption);
+                  }
+                   
+                },
+                error : function(data)
+                {
+                    swal("Error in getting product information");
+                },
+            });
+
+        $("#selectProduct").change(function()
+        {
+          var valueData=$(this).val()
+          var tmp=valueData.split('_');
+          var selling_price=tmp[0];
+          $('#selling_price').text(selling_price);
+        });
+      });
+    </script>
+
+  </body>
+</html>

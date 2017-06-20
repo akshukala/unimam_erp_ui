@@ -20,6 +20,8 @@ from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 from unimax_erp.views import erp_altered_login, change_password, user_logout
 from erpapp import urls as erpapp_urls
+from operations import urls as operational_dashboard_urls
+from warehouse import urls as warehouse_dashboard_urls
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
@@ -28,5 +30,7 @@ urlpatterns = [
     url(r'^login/$', erp_altered_login),
     url(r'^changepassword/$', change_password),
     url(r'^logout/$', user_logout, name='user_logout'),
+    url(r'^operations/',include(operational_dashboard_urls)),
+    url(r'^warehouse/',include(warehouse_dashboard_urls)),
     #url(r'^logout/$', 'django.contrib.auth.views.logout', {'next_page': '/login/'}),
 ]

@@ -1,0 +1,753 @@
+<html>
+	<head>
+		{% load staticfiles %}
+		<title> Unimax|Operations</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- <link rel="icon" type="image/png" sizes="96x96" href="{% static 'images/krishi_favicon.png' %}"/> -->
+		<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}" />
+		<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+		<link rel="stylesheet" href="{% static 'css/menubar_style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/sweetalert.css' %}">
+    <style>
+      #loading-indicator {
+        position: absolute;
+        left: 550px;
+        top: 60px;
+      }
+      a:hover {
+            cursor:pointer;
+        }
+    </style> 
+
+		<script src="{% static 'js/jquery-1.11.3.min.js' %}"></script>
+		<script src="{% static 'js/bootstrap.min.js' %}"></script>
+		<script src="{% static 'js/jquery-ui-1.11.4.min.js' %}"></script>
+    <script src="{% static 'js/common.js' %}"></script>
+    <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/sweetalert.min.js' %}"></script>	
+  </head>
+	<body>
+		<div class="navbar-wrapper">
+    		<div class="container-fluid">
+        		<nav class="navbar navbar-fixed-top">
+            		<div class="container">
+                		<div class="navbar-header">
+                    		<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+          						    <span class="icon-bar"></span>
+          						    <span class="icon-bar"></span>
+          						    <span class="icon-bar"></span>                        
+      						      </button>
+                    		<a class="navbar-brand" href="/erp/" id="home_url"><img src="{% static 'images/logo-uni.png' %}" align="left" height="40px" width="150px" style="margin-top:-5px;" class="img-responsive"></a>
+                		</div>
+                		<div id="navbar" class="navbar-collapse collapse">
+                    		<ul class="nav navbar-nav">
+                        	<li><a id="client_url" href="/erp/client/search/"> <strong>Client </strong></a></li>
+                          <li><a id="product_url" href="/erp/catalog/view"><strong>Products</strong></a></li>
+                          <li class="active"><a id="operation_url" href="/operations/"> <strong>Operations</strong></a></li>
+                          <!-- <li><a href="/operational_dashboard/stock/" id="stock"><strong>Stock/CP</strong></a></li>
+                          <li><a href=/operational_dashboard/after_dispatch> <strong>After Dispatch Status</strong></a></li> -->
+          						
+          						  </ul>
+                    		<ul class="nav navbar-nav pull-right">
+                        		<li><a href="/logout/"><strong><span class="glyphicon glyphicon-log-out"></span>Logout</strong></a></li>
+                    		</ul>
+                		</div>
+            		</div>
+        		</nav>
+    		</div>
+		</div>
+
+    <br>
+    <div class="container-fluid">
+      <img src="{% static 'images/ajax-loader.gif' %}" id="loading-indicator" style="display:none" />
+      <br><br><br>
+      <div class="row">
+        <div class="col-md-6">
+          <h4 id="orderCount" style="color: #57afdb;"></h4>
+        </div>
+      </div>
+      <div class="row">
+        <div class="table-responsive" id="table_generation"> 
+            <table id="order_table" class="table table-striped table-bordered table-condensed text-center table-responsive">
+              <thead>
+                <tr style="color: #000; background: #abd7ed">
+                  <td> No</td>
+                  <td> Order Id </td>
+                  <td> Client Name</td>
+                  <td> Address </td>
+                  <td> Order Date </td>
+                  <td> Item </td>
+                  <td> Quantity </td>
+                  <td> Remaining Stock </td>
+                  <td> Cost </td>
+                  <td> Deliverable by </td>
+                  <td> Verify Order </td>
+                  <td> Fullfillable </td>
+                  <td> Delivery By</td>
+                  <td> Delivery Challan</td>
+                  <td> Driver Name</td>
+                </tr>
+              </thead>
+              <tbody id="order_body">
+              
+              </tbody>
+            </table>
+        </div>
+      </div>
+      <h4 id="pages"></h4>
+      <ul class="pagination" id ="page_numbers"></ul>
+    </div>
+
+
+    <!-- Verify client modal -->
+    <div class="modal fade bs-modal-lg" id="verify_order" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+          <h3 class="modal-title" id="lineModalLabel">Verify Order</h3>
+        </div>
+        <div class="modal-body">
+          <div class="container" style="">
+            <div class="row">
+              <h4><b> Client Information </b></h4>
+            </div>
+            <p><h5 id="client_id"></h5></p>
+            <p><h5 id="sales_order_id"> </h5></p> 
+            <p><h5 id="name"></h5></p>
+            <p><h5 id="contact"></h5></p>
+            <p><h5 id="status"></h5></p> 
+            <p><h5 id="created_on"></h5></p>
+            <div id="editAddress">
+              <p><h5 id="billing_address"></h5></p>
+              <p><h5 id="billing_addresss1"></h5></p>
+            </div>
+            <div class="row">
+              <h4><b> Product Detail </b></h4>
+            </div>
+            <table class="table-bordered text-center" id="product_table">
+              <thead>
+                <tr style="background-color: silver;">
+                  <td> Item Name </td>
+                  <td> Quantity </td>
+                  <td> Unit Selling Price </td>
+                  <td> Net Price </td>
+                </tr>
+              </thead>
+              <tbody id="product_body">
+                
+              </tbody>
+            </table>
+            <div>
+              <h4><b id="history"></b></h4>
+            </div>
+            <table class="table-bordered text-center vcenter" id="order_history">
+              <tbody>
+                <tr style="background-color: silver;">
+                  <td> Sr No </td>
+                  <td> Order No</td>
+                  <td> Created By </td>
+                  <td> Created On </td>
+                  <td> COD Amount </td>
+                  <td> Order Status </td>
+                </tr>
+              </tbody>
+            </table>
+            <br>
+            <div>
+              <button id="verify" data-dismiss="modal" class="btn btn-primary">Verify</button>
+            </div>
+          </div> 
+        </div>    
+      </div>
+      </div>    
+    </div>
+
+    <script type="text/javascript">
+      var Verify_click = "NotClicked";
+      $(document).ready(function(){
+        $("#loading-indicator").show();
+        var currentUrl = window.location.href;
+        url_id = currentUrl.split('status=');
+        if(localStorage.getItem("page_no")){
+          pagination(localStorage.getItem("page_no"));
+        }
+        else{
+          $.ajax(
+                  {
+                    type:'get',
+                    url: "{{ operation_service_url }}"+"orders/?status="+url_id[1]+"&page=1",
+                    headers: {'content_type':'application/json',
+                              'X-Authorization-Token': "{{request.session.userservice_key}}"},
+                    dataType: 'json',
+                    success : function(data)
+                            {
+                              console.log(data);
+                              if(data['responseData']){
+                                result = data['responseData'];
+                              }
+                              else{
+                                result = data;  
+                              }
+                              var orders =[];
+                              var len = result.length;
+                              for(i=0; i<(len-2); i++){
+                                orders[i] = result[i];
+                              }
+                              var No_of_pages = result.slice(-1)[0]; 
+                              var order_count = result.slice(-2)[0];
+                              var i=1;
+                              var page_data = '';
+                              $("#pages").text("Page 1 of "+ No_of_pages); 
+                              while(i<= No_of_pages){
+                                page_data += "<li><a  onclick='pagination("+i+")' id='"+i+"'>"+ i +"</a></li>";
+                                i = i+1;
+                              }
+                              $("#page_numbers").html(page_data);
+                              $("#orderCount").text("Showing "+ order_count + " " + window.unescape(url_id[1]) + " Orders.");
+                              populate_order_table(orders,window.unescape(url_id[1]));
+                              $("#loading-indicator").hide();
+                            },
+                        error : function(error)
+                        {
+                            window.alert(error['responseText']);
+                        }
+                      });
+          }
+
+        $("#verify").click(function(){
+            Verify_click = "Clicked";
+            swal("Order sucessfully verified");
+          });
+
+        $("#operation_url").click(function(){
+            window.localStorage.clear();
+          });
+        $("#home_url").click(function(){
+            window.localStorage.clear();
+          });
+        $("#client_url").click(function(){
+            window.localStorage.clear();
+          });
+        $("#product_url").click(function(){
+            window.localStorage.clear();
+          });
+
+      });
+      
+      function pagination(page){
+          localStorage.setItem("page_no", page);
+          $.ajax(
+            {
+                type:'get',
+                url: "{{ operation_service_url }}"+"orders/?status="+url_id[1]+"&page="+page,
+                headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}"},
+                dataType: 'json',
+                success : function(data)
+                {
+                    console.log(data);
+                    if(data['responseData']){
+                      result = data['responseData'];
+                    }
+                    else{
+                        result = data;  
+                        } 
+                    var orders =[];
+                    len = result.length;
+                    for(i=0; i<(len-2); i++){
+                      orders[i] = result[i];
+                    }
+                    var No_of_pages = result.slice(-1)[0];
+                    var order_count = result.slice(-2)[0];
+                    var page_id = document.getElementById("pages");
+                    var page_no = document.createTextNode("Page " + page +" of "+ No_of_pages);
+                    document.getElementById("pages").innerHTML = "";
+                    page_id.appendChild(page_no);
+                    var j=1;
+                    var page_data = '';
+                    while(j<= No_of_pages){
+                      page_data += "<li><a  onclick='pagination("+j+")' id='"+j+"'>"+ j +"</a></li>";
+                      j = j+1;
+                    }
+                    $("#page_numbers").html(page_data);
+                    $("#orderCount").text("Showing "+ order_count + " " + window.unescape(url_id[1]) + " Orders.");
+                    populate_order_table(orders,window.unescape(url_id[1]));
+                    $("#loading-indicator").hide();
+                 },
+                 error: function(data)
+                 {
+                     window.alert(error['responseText']);
+                 }
+               });   
+
+        }
+
+        function populate_order_table(result, selected_status){
+          DeleteRows();
+          var dropdown;
+          var fid;
+
+          for(i=0;i<result.length;i++){
+          
+          fid = result[i]['order_id'];
+          var sr_no = document.createTextNode((i+1));
+          var order_id = document.createTextNode(result[i]['order_id']);
+          var client_id = result[i]['clientid'];
+          var customer_name = document.createTextNode(result[i]['client_name']);
+          
+          var address = document.createTextNode(result[i]['address']['AddressLine1']+ "-" + result[i]['address']['Pincode']+" "+result[i]['address']['State']);
+          var verify_button = document.createElement("BUTTON");
+          verify_button.setAttribute("class","btn btn-primary btn-xs");
+          var t = document.createTextNode("Verify Order");
+          verify_button.appendChild(t);
+          verify_button_id = "d"+fid;
+          verify_button.setAttribute("data-toggle","modal");
+          verify_button.setAttribute("data-target","#verify_order");
+          verify_button.setAttribute("id",verify_button_id);
+          order_date = document.createTextNode(result[i]['created_date']);
+          order_item_div = document.createElement('DIV');
+          for(k=0;k<(result[i]['orderitems']).length;k++){
+            order_items=document.createTextNode((k+1) + ". " +result[i]['orderitems'][k] +'\t');
+            order_item_div.appendChild(order_items);
+            var br = document.createElement("br");
+            order_item_div.appendChild(br);
+          }
+          order_qty_div = document.createElement('DIV');
+          for(k=0;k<(result[i]['quantity']).length;k++){
+            order_quantity=document.createTextNode(result[i]['quantity'][k] + '\t');
+            order_qty_div.appendChild(order_quantity);
+            var br = document.createElement("br");
+            order_qty_div.appendChild(br);
+          }
+          order_price_div = document.createTextNode(result[i]['amount']);
+          
+          remaining_stock_div = document.createElement('DIV');
+          for(k=0;k<(result[i]['remaining_stock']).length;k++){
+            remain_stk=document.createTextNode(result[i]['remaining_stock'][k] + '\t');
+            remaining_stock_div.appendChild(remain_stk);
+            var br = document.createElement("br");
+            remaining_stock_div.appendChild(br);
+          }
+          var url_client="/erp/client/view/"+client_id;
+          var client_link = document.createElement("a");
+          client_link.setAttribute('href',url_client);
+          client_link.appendChild(customer_name);
+          
+          var checkbox_id = "a"+fid;
+          var checkbox = document.createElement("INPUT");
+          checkbox.setAttribute("type", "checkbox");
+          checkbox.setAttribute('id',checkbox_id)
+
+          var dropdown_id = "b"+fid;
+          dropdown = document.createElement("SELECT");
+          dropdown.setAttribute('id',dropdown_id);
+          dropdown.setAttribute('class','form-control');
+
+          var Select_deliverable = document.createTextNode("Select"); 
+          var option1 = document.createElement("OPTION");
+          option1.setAttribute('value',"Select");
+          option1.appendChild(Select_deliverable);
+          dropdown.appendChild(option1);
+
+          var self_option = document.createTextNode("Self");
+          var option2 = document.createElement("OPTION");
+          option2.setAttribute('value','Self');
+          option2.appendChild(self_option);
+          dropdown.appendChild(option2);
+          var tempo = document.createTextNode("Tempo");
+          var option5 = document.createElement("OPTION");
+          option5.setAttribute('value',"Tempo");
+          option5.appendChild(tempo);
+          dropdown.appendChild(option5);
+          // var IP_bpcod = document.createTextNode("India Post (BPCOD)");
+          // var option5 = document.createElement("OPTION");
+          // option5.setAttribute('value',"India Post (BPCOD)");
+          // option5.appendChild(IP_bpcod);
+          // dropdown.appendChild(option5);
+          // var Channel_partner_option = document.createTextNode("Channel Partner");
+          // var option4 = document.createElement("OPTION");
+          // option4.setAttribute('value',"Channel Partner");
+          // option4.appendChild(Channel_partner_option);
+          // dropdown.appendChild(option4);
+          // var IP_nocod = document.createTextNode("India Post (NONCOD)");
+          // var option6 = document.createElement("OPTION");
+          // option6.setAttribute('value',"India Post (NONCOD)");
+          // option6.appendChild(IP_nocod);
+          // dropdown.appendChild(option6);
+          // var IP_option = document.createTextNode("India Post (SPCOD)"); 
+          // var option3 = document.createElement("OPTION");
+          // option3.setAttribute('value',"India Post (SPCOD)");
+          // option3.appendChild(IP_option);
+          // dropdown.appendChild(option3);
+          
+          // orderComplete_dropdown_id = "c"+fid;
+          // orderComplete_dropdown = document.createElement("SELECT");
+          // orderComplete_dropdown.setAttribute('id',orderComplete_dropdown_id);
+
+          // var Select_order_status = document.createTextNode("Select"); 
+          // var option_select = document.createElement("OPTION");
+          // option_select.setAttribute('value',"Select");
+          // option_select.appendChild(Select_order_status);
+          // orderComplete_dropdown.appendChild(option_select);
+
+          // var complete_option = document.createTextNode("Order Completed");
+          // var option_order_complete = document.createElement("OPTION");
+          // option_order_complete.setAttribute('value','ORDER COMPLETED');
+          // option_order_complete.appendChild(complete_option);
+          // orderComplete_dropdown.appendChild(option_order_complete);
+         
+          // var Return_option = document.createTextNode("Return Completed"); 
+          // var option_return = document.createElement("OPTION");
+          // option_return.setAttribute('value',"RETURN COMPLETED");
+          // option_return.appendChild(Return_option);
+          // orderComplete_dropdown.appendChild(option_return);
+          
+          internal_note_id = "e"+fid;
+          var internal_note_button = document.createElement("BUTTON");
+          internal_note_button.setAttribute('id',internal_note_id);
+          internal_note_button.setAttribute('class',"btn btn-primary btn-xs");
+          internal_note_span = document.createElement("SPAN");
+          internal_note_span.setAttribute('class','glyphicon glyphicon-comment');
+          internal_note_button.appendChild(internal_note_span);
+          internal_note_button.setAttribute("data-toggle","tooltip");
+          internal_note_button.setAttribute("title",result[i]['internal_note']);
+                  
+        //   var tracking_no = result[i]['tracking_no'];
+          
+        //   if(tracking_no.match("^EZ")){
+        //       tracking_link_data=document.createTextNode(result[i]['tracking_no']);
+        //     var url_tracking="https://track.aftership.com/india-post/"+result[i]['tracking_no'];
+        //     tracking_link = document.createElement("a");
+        //   tracking_link.setAttribute('href',url_tracking);
+        //   tracking_link.appendChild(tracking_link_data);
+        // }
+        // else{
+        //   tracking_link=document.createTextNode(result[i]['tracking_no']);
+        // }
+          var delivery_by = document.createTextNode(result[i]['delivery_by']);
+          var delivery_challan = document.createTextNode(result[i]['delivery_challan']);
+          var driver_name = document.createTextNode(result[i]['driver_name']);
+           tabBody=document.getElementById("order_body");
+           row=document.createElement("tr");
+           row.setAttribute("id",fid);
+           row.setAttribute("class",'highlight_row');
+               
+               cell1 = document.createElement("td");
+               cell2 = document.createElement("td");
+               cell3 = document.createElement("td");
+               cell4 = document.createElement("td");
+               cell5 = document.createElement("td");
+               cell6 = document.createElement("td");
+               cell7 = document.createElement("td");
+               cell8 = document.createElement("td");
+               cell9 = document.createElement("td");
+               cell10 = document.createElement("td");
+               cell11 = document.createElement("td");
+               cell12 = document.createElement("td");
+               cell13 = document.createElement("td");
+               cell14 = document.createElement("td");
+               cell15 = document.createElement("td");
+               
+               cell1.appendChild(sr_no);
+               cell2.appendChild(order_id);
+               cell3.appendChild(client_link);
+               cell4.appendChild(address);
+               cell5.appendChild(order_date);
+               cell6.appendChild(order_item_div);
+               cell6.appendChild(internal_note_button);
+               cell7.appendChild(order_qty_div);
+               cell8.appendChild(remaining_stock_div);
+               cell9.appendChild(order_price_div);
+               cell10.appendChild(dropdown);
+               cell11.appendChild(verify_button);
+               cell12.appendChild(checkbox);
+               cell15.appendChild(delivery_by);
+               cell13.appendChild(delivery_challan);
+               cell14.appendChild(driver_name);
+
+               row.appendChild(cell1);
+               row.appendChild(cell2);
+               row.appendChild(cell3);
+               row.appendChild(cell4);
+               row.appendChild(cell5);
+               row.appendChild(cell6);
+               row.appendChild(cell7);
+               row.appendChild(cell8);
+               row.appendChild(cell9);
+               row.appendChild(cell10);
+               row.appendChild(cell11);
+               row.appendChild(cell12);
+               row.appendChild(cell15);
+               row.appendChild(cell13);
+               row.appendChild(cell14);
+               
+               tabBody.appendChild(row);
+               
+               if(result[i]['internal_note']==''){
+                $("#e"+fid).hide();
+               }
+               else{
+                $("#e"+fid).show();
+               }
+              if(selected_status == "ALL"){
+                show_hide_column(12,true);
+                show_hide_column(13,true);
+                show_hide_column(14,true);
+                show_hide_column(9, false);
+                show_hide_column(10, false); 
+                show_hide_column(11,false);
+                show_hide_column(7,false);
+              }    
+              if(selected_status == "CREATED"){
+                show_hide_column(12,false);
+                show_hide_column(13,false);
+                show_hide_column(14,false);
+                show_hide_column(9, true);
+                show_hide_column(10, true); 
+                show_hide_column(11,true);
+                show_hide_column(7,true);              
+              }
+              if(selected_status == "DISPATCHED" || selected_status == "RETURN COMPLETED" || selected_status =='ORDER COMPLETED'){
+                show_hide_column(12, true);  
+                show_hide_column(13, true);  
+                show_hide_column(14, true) ; 
+                show_hide_column(9, false);
+                show_hide_column(10, false); 
+                show_hide_column(11,false);
+                show_hide_column(7,false);    
+              }
+              if(selected_status == "FULFILLABLE" || selected_status == 'READY TO DISPATCH'){
+                  show_hide_column(12,true);
+                  show_hide_column(13,false);
+                  show_hide_column(14,false);
+                  show_hide_column(9, false);
+                  show_hide_column(10, false); 
+                  show_hide_column(11,false);
+                  show_hide_column(7,false);    
+              }  
+        
+        checkbox.onclick = function(){
+          var order = $(this).attr('id');
+          var orderid =  order.slice( 1 );
+          var delivery_by = $("#b"+orderid).val();
+          if((Verify_click =="Clicked") && (delivery_by != "Select")){
+            if(this.checked){
+              $.ajax(
+                        {
+                          type: 'put',
+                          url: "{{operation_service_url}}"+"orders/",
+                          headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}"},
+                          dataType: 'json',
+                          data: JSON.stringify({
+                                                'order_id': orderid   
+                                              }),
+                          success : function(data)
+                          {
+                            console.log(data);
+                            document.getElementById(orderid).checked = false;
+                            if(data['responseData']){
+                              result = data['responseData'];
+                            }
+                            else{
+                              result = data;  
+                            }
+                            if(result['responseCode']==200){
+                              swal({
+                                title: 'Message',
+                                text: result['Message']
+                                },function(){
+                                    location.reload();
+                                });
+                            }
+                            else{
+                              swal({
+                                title: 'Message',
+                                text: result['Message']
+                                },function(){
+                                    //location.reload();
+                                });
+                            } 
+                              
+                          },
+                          error : function(error)
+                          {
+                            $('#'+order).prop('checked', false);
+                            console.log(error['responseText']);
+                            swal("Deliverable by not selected");
+                          },
+                        });
+              }
+          }
+          else{
+            swal("Please select delivery by and verify the order");
+            }
+          }
+        
+        verify_button.onclick = function(){
+          var order = $(this).attr('id');
+          var orderid =  order.slice( 1 );
+          $('#a'+orderid).prop('checked', false);
+          var addr ='';
+          $.ajax(
+                        {
+                            type: 'get',
+                            url: "{{operation_service_url}}"+"client_history/?order_id="+orderid,
+                            headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}"},
+                            dataType: 'json',
+                            success : function(result)
+                            {
+                              console.log(result);
+                              var data = result['responseData'];
+                              $("#client_id").text("Client Id: \t"  + data[0]['client_id']);
+                              $("#sales_order_id").text("Sales Order Id: \t"  + data[0]['order_id']);
+                              $("#name").text("Name: \t"  + data[0]['clientname']);
+                              $("#contact").text("Contact No: \t"  + data[0]['mobile_no']);
+                              $("#status").text("Status: \t"  + data[0]['status']);
+                              $("#created_on").text("Created On: \t" + data[0]['created_date']);
+                              
+                              $("#billing_address").text("Address Line 1:\t" + data[0]['address']['AddressLine1']); 
+                              $("#billing_addresss1").text(", Pincode- " + data[0]['Pincode'] + ", State- " + data[0]['State']);
+                              var item_count = data[0]['orderitems'].length;
+                              var discount = data[0]['discount'] + ".00";
+                              var total = data[0]['cod_amt'] + ".00";
+                              for(i=0;i<item_count;i++){
+                                var item_data = "<tr><td>"+data[0]['orderitems'][i]+"</td><td>"+data[0]['quantity'][i]+"</td><td>"+data[0]['selling_price'][i]+"</td><td>"+(data[0]['quantity'][i]*data[0]['selling_price'][i])+"</td></tr>";
+                                $("#product_body").append(item_data);
+                              }
+                              var product_table_footer = "<tr><td colspan=2></td><td>Order Discount</td><td>"+discount+"</td></tr><tr><td colspan=2></td><td>Total Amount</td><td>"+total+"</td></tr>";
+                              $("#product_body").append(product_table_footer); 
+                              populate_order_history(data);
+                            },
+                            error : function(error)
+                            {
+                                window.alert(error);
+                            },
+                        });
+            }
+
+            dropdown.onchange = function(){
+              var deliveryBy = $(this).val();
+              var order = $(this).attr('id');
+              var orderid =  order.slice( 1 );
+              $.ajax(
+                      {
+                        type: 'post',
+                        url: "{{operation_service_url}}"+"orders/",
+                        headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}"},
+                        dataType: 'json',
+                        data: JSON.stringify({
+                                              'delivery_by': deliveryBy,
+                                              'orderid': orderid,
+                                            }),
+                        success : function(result)
+                        {
+                          console.log(result);
+                          swal("Deliverable By Sucessfully created");
+                          $("#"+orderid).val(deliveryBy).attr("selected", "selected");
+                        },
+                        error : function(error)
+                        {
+                          window.alert(error);
+                        },
+                  });
+            } 
+
+
+        //   orderComplete_dropdown.onchange = function(){
+        //     var order_status=$(this).val()
+        //     var order = $(this).attr('id');
+        //     var orderid =  order.slice( 1 );
+
+        //     $.ajax(
+        //                 {
+        //                     type: 'post',
+        //                     url: "{{operational_service_url}}"+"order_complete/",
+        //                     headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}"},
+        //                     dataType: 'json',
+        //                     data: JSON.stringify({
+        //                                             'order_status': order_status,
+        //                                             'order_id': orderid 
+        //                                             }),
+        //                     success : function(result)
+        //                     {
+        //                       alert("Status Sucessfully changed to " + order_status );
+                             
+        //                       $('#'+orderid).remove();
+        //                      },
+        //                     error : function(error)
+        //                     {
+        //                       window.alert(error);
+        //                     },
+        //                 });
+
+        //   }        
+        }
+        }
+
+        function populate_order_history(result){
+          DeleteModalRows();
+          
+          $("#history").text("Order History (Total: " + result.length + ")");
+          for(i=0;i<=result.length;i++){
+            sr_no = document.createTextNode((i+1));
+            order_id = document.createTextNode(result[i]['order_id']);
+            created_by = document.createTextNode(result[i]['created_by']);
+            created_on = document.createTextNode(result[i]['created_date']);
+            cod_amount = document.createTextNode(result[i]['cod_amt']);
+            order_status = document.createTextNode(result[i]['status']);
+            tabBody1 = document.getElementById("order_history");
+                 row = document.createElement("tr");
+                 cell1 = document.createElement("td");
+                 cell2 = document.createElement("td");
+                 cell3 = document.createElement("td");
+                 cell4 = document.createElement("td");
+                 cell6 = document.createElement("td");
+                 cell7 = document.createElement("td");
+
+                 cell1.appendChild(sr_no);
+                 cell2.appendChild(order_id);
+                 cell3.appendChild(created_by);
+                 cell4.appendChild(created_on);
+                 cell6.appendChild(cod_amount);
+                 cell7.appendChild(order_status);
+
+                 row.appendChild(cell1);
+                 row.appendChild(cell2);
+                 row.appendChild(cell3);
+                 row.appendChild(cell4);
+                 row.appendChild(cell6);
+                 row.appendChild(cell7);
+
+                 tabBody1.appendChild(row);
+
+            }
+          }
+
+        function DeleteModalRows() {
+                  var rowCount = order_history.rows.length;
+                  for (var i = rowCount - 1; i > 0; i--) {
+                      order_history.deleteRow(i);
+                  }
+
+                }
+
+        function DeleteRows() {
+                  var rowCount = order_table.rows.length;
+                  for (var i = rowCount - 1; i > 0; i--) {
+                      order_table.deleteRow(i);
+                  }
+          }
+        function show_hide_column(col_no, do_show) {
+            var rows = document.getElementById('order_table').rows;
+            
+            for (var row = 0; row < rows.length; row++) {
+                var cols = rows[row].cells;
+                if (col_no >= 0 && col_no < cols.length) {
+                    cols[col_no].style.display = do_show ? '' : 'none';
+                }
+            }
+        }  
+    </script>
+  </body>
+</html>
