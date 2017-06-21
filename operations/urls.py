@@ -8,5 +8,6 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^logout/$', views.user_logout, name='logout'),
     url(r'^orders/$', views.orders, name='orders'),
+    url(r'^stock/$', views.stock, name='stock'),
     # url(r'^after_dispatch/$', views.after_dispatch, name='after_dispatch')
 ]
