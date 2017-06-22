@@ -51,5 +51,8 @@ def update_barcode(request):
 @login_required(login_url='/login/')
 def invoice(request):
     return render_to_response('warehouse/invoice.html',locals(),RequestContext(request))
-          
+
+@login_required(login_url='/login/')
+def dispatch(request):
+	return render_to_response('warehouse/manage_order_dispatch.html',locals(),RequestContext(request))
     

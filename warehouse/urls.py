@@ -8,5 +8,6 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^update_barcode/', views.update_barcode,name='updateBarcode'),
     url(r'^invoice/$', views.invoice,name='invoice'),
+    url(r'^dispatch/', views.dispatch,name='dispatch'),
     url(r'^logout/$', views.user_logout, name='logout'),
 ]

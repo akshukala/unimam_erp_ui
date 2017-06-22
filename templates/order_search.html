@@ -23,23 +23,23 @@
         </div>
       </div>
       <br>
-        <div class="row text-center">
-          <form method="get" action="{{ order_management_service_url }}reports/">
-              <div class="col-md-3">
-                <div class="left">
-                    <p>From Date: <input format="yyyy-MM-dd" id="from_date" name="from_date"></p>
-                </div>
-              </div>
-              <div class="col-md-3">
-                  <div class="right">
-                      <p>To Date: <input format="yyyy-MM-dd" id="to_date" name="to_date"></p>
-                  </div>
-              </div>
-              <div class="col-md-3">
-                  <button type="submit" id="generateExcel" class="btn btn-primary">Download</button>
-              </div>
-            </form>
+      <div class="row">
+        <form method="get" action="{{ order_management_service_url }}reports/">
+          <div class="col-md-3">
+            <div class="left">
+              <p><b>From Date:</b> <input format="yyyy-MM-dd" class="form-control" id="from_date" name="from_date"></p>
+            </div>
           </div>
+          <div class="col-md-3">
+            <div class="right">
+              <p><b>To Date:</b> <input format="yyyy-MM-dd" class="form-control" id="to_date" name="to_date"></p>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <button type="submit" id="generateExcel" class="btn btn-primary">Download</button>
+          </div>
+        </form>
+      </div>
 
            <!--  <div class="col-md-3">
                 <input type="submit" id="show_logs_by_date" class="btn btn-primary" value="Download"/>
