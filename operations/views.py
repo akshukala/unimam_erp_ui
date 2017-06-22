@@ -47,4 +47,8 @@ def index(request):
 @login_required(login_url='/login/')
 def orders(request):
  	return render_to_response('operations/filtered_orders.html',locals(),RequestContext(request))
+
+@login_required(login_url='/login/')
+def stock(request):
+  return render_to_response('operations/stock_operations.html',locals(),RequestContext(request))
   

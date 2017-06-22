@@ -105,12 +105,11 @@
                   }
                 });
 
-        $('#search_village').on('change', function () {
+        // $('#search_village').on('change', function () {
+          // $("#search_village").click(function(){
 
-        	// $( "#search_village" ).click(function() {
-
+        	$( "#search_village" ).focusout(function() {
                     var value = $(this).val();
-                    alert(value);
                     $.ajax(
                     {
                       type:'get',
@@ -127,7 +126,6 @@
                               result = data;  
                             }
                         console.log(result);
-                        alert("Hiii");
                         $("#search_results").show();    
                         t.rows().remove().draw();
                         populate_table(result);
