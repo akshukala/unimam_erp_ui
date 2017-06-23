@@ -246,7 +246,7 @@
                 // var qty_id = 'qt' + (m+1).toString();
                 var barcode_id = 'bar' + (j+1).toString();
                 var qty_id = 'qt' + (j+1).toString();
-                formdata += " <div><label class='control-label col-xs-6' style='text-align:center;'>"+result[i]['orderitems'][j]+"</label><div class='col-xs-4'><input type='textbox' id='"+barcode_id+"' name='barcode' class='form-control' placeholder='Scan Barcode'></div><div class='col-xs-2'><input type='number' id='"+qty_id+"' class='form-control' name='qty' placeholder='Enter Quantity'></div></div><br><br>";
+                formdata += " <div><label class='control-label col-xs-6' style='text-align:center;'>"+result[i]['orderitems'][j]+"</label><div class='col-xs-4'><input type='textbox' id='"+barcode_id+"' name='barcode' class='form-control' placeholder='Scan Barcode'></div><div class='col-xs-2'><input type='number' id='"+qty_id+"' class='form-control' name='qty' value='"+result[i]['orderitem_quantity'][j]+"' disabled></div></div><br><br>";
               //}
             }
 

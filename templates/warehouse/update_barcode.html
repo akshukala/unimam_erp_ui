@@ -65,6 +65,7 @@
       <br><br>
       <div class="row">
         <div class="col-md-12">
+          <div class="errors"></div>
           <div class="table-responsive"> 
             <table id="product_stk_table" class="table table-striped table-bordered text-center vcenter table-responsive">
                 <col width="200">
@@ -138,6 +139,76 @@
           var selling_price=tmp[0];
           $('#selling_price').text(selling_price);
         });
+
+        $("#update_btn").one('click',function(){
+          var errors=[];
+          var product = $("#selectProduct").val();
+          var product_id = product.split("_")[2];
+          var quantity = $("#quantity").val();
+          $("#selectProduct").css({"border-color": "#ccc"});
+          $("#quantity").css({"border-color": "#ccc"});
+          if(product == "Select") {
+            errors[errors.length] = "Please select the product.";
+            $("#selectProduct").css({"border-color": "#ff4c4c"});
+            $("#selectProduct").focus();
+          }
+          if(quantity.length == 0) {
+            errors[errors.length] = "Enter the quantity.";
+            $("#quantity").css({"border-color": "#ff4c4c"});
+            $("#quantity").focus();
+          }
+          if (errors.length > 0) {
+            reportErrors(errors);
+            return false;
+          }
+
+          $.ajax(
+                    {
+                        type:'put',
+                        url: "{{ warehouse_service_url }}barcode/",
+                        headers: {'content_type':'application/json',
+                                        'X-Authorization-Token' : "{{request.session.userservice_key}}"},
+                        dataType: 'json',
+                        data: JSON.stringify({ 'quantity': quantity,
+                                'product_id': product_id
+                              }),
+                        success : function(data)
+                            {   
+                                console.log(data);
+                                if(data['responseData']){
+                                    result = data['responseData'];
+                                }
+                                else{
+                                    result = data;  
+                                }
+                                swal({
+                                  title: "Success!!!",
+                                  text: result,
+                                  type: "success",
+                                },
+                                function(){
+                                  location.reload();
+                                });  
+                            },
+                        error : function(error)
+                                {
+                                    window.alert(error['responseText'])
+                                }
+                  });
+        });
+        
+
+        function reportErrors(errors){
+          $('.errors').empty();
+          var msg = [];
+          for (var i = 0; i<errors.length; i++) {
+            var numError = i + 1;
+            msg [i]= "\n" + numError + ". " + errors[i] ;
+          }
+          $.each(msg, function(){
+            $('.errors').append("<div class='alert alert-danger alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button>" + this +"</div>");
+          });
+        }
       });
     </script>
 

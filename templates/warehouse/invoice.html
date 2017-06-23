@@ -49,87 +49,73 @@
                 </div>
             </section>
             <br>
-            <div class="row">
-                <div class="table-responsive"> 
-                    <table class="table table-bordered table-condensed">
-                        <col width="500">
-                        <col width="500">
-                        <tr>
-                            <td><b>Invoice No: 101</b></td>
-                            <td><b>Dated: 20/6/2017</b></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <h4><b>Unimax Enterprises</b></h4>
-                                <p>562/6, Nirnal Heights Congress Bhavan Road,<br>Shivajinagar Pune-411005 <br> Maharashtra.</p>
-                            </td>
-                            <td>
-                                <p>Buyer</p>
-                                <h4><b>XYZ Pvt.Ltd</b></h4>
-                                <p>12th Floor, Building No-8-C<br> DLF Cyber City Phase-2 <br> Khardi Pune-411052 <br> Maharashtra </p>
-                            </td>
-                        </tr>
-                    </table>
-                    <table class="table table-bordered table-condensed" style="margin-top:-22px;">
-                        <tr>
-                            <td><b>Sr No.</b></td>
-                            <td><b>Description Of Goods</b></td>
-                            <td><b>Quantity</b></td>
-                            <td><b>Rate</b></td>
-                            <td><b>Amount</b></td>
-                        </tr>
-                        <tr height='450'>
-                            <td>
-                                <b>1</b><br>
-                                <b>2</b><br>
-                                <b>3</b>
-                            </td>
-                            <td>
-                                <b>Pipe 1 inch </b><br>
-                                <b>Pipe 1/2 inch</b><br>
-                                <b>Pipe 3 inch </b>
-                            </td>
-                            <td>
-                                <b>2</b><br>
-                                <b>3</b><br>
-                                <b>4</b>
-                            </td>
-                            <td>
-                                <b>400.00</b><br>
-                                <b>250.00</b><br>
-                                <b>700.00</b>
-                            </td>
-                            <td>
-                                <b>800.00</b><br>
-                                <b>750.00</b><br>
-                                <b>2800.00</b>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4" align="right"><b>Total</b></td>
-                            <td><b>4350.00</b></td>
-                        </tr>
-                        <tr>
-                            <td colspan="5">
-                                <p>Amount Chargeable (in words)</p>
-                                <h4><b>Indian Rupees Four Thousand Three Hundred and Fifty Only.</b></h4><br><br><br><br>
-                                <p>
-                                    <b>Company's Service Tax No: AADCK7606GSD002</b><br>
-                                    <b>Company's PAN: AADCK7606G</b>
-                                </p>
-                            </td>
-                        </tr>
-                        <tr>
-                           <td colspan="2">
-                               <p>Declartion: We declare that this invoice shows the actual price of the goods described and that  all particulars are true and correct.<br>All the above amount is inclusive of tax</p>
-                           </td>
-                           <td colspan="3">
-                               <p align="right"><b>For Unimax Enterprises.</b></p><br><br><br>
-                               <p align="right">Authorised Signature</p>
-                           </td> 
-                        </tr>
-                    </table>
-                    <p align="middle">This is Computer Generated Invoice.</p>
+            <div id="error_data"></div>
+            <div id="invoice_data">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive"> 
+                            <table class="table table-bordered table-condensed">
+                                <col width="500">
+                                <col width="500">
+                                <tr>
+                                    <td id='invoice_no'></td>
+                                    <td id='dated'></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h4><b>Unimax Enterprises</b></h4>
+                                        <p>562/6, Nirnal Heights Congress Bhavan Road,<br>Shivajinagar Pune-411005 <br> Maharashtra.</p>
+                                    </td>
+                                    <td id="address"></td>
+                                </tr>
+                            </table>
+                            <table class="table table-bordered table-condensed" style="margin-top:-22px;">
+                                <tr>
+                                    <td><b>Sr No.</b></td>
+                                    <td><b>Description Of Goods</b></td>
+                                    <td><b>Quantity</b></td>
+                                    <td><b>Rate</b></td>
+                                    <td><b>Amount</b></td>
+                                </tr>
+                                <tr height='450'>
+                                    <td id="sr_no"></td>
+                                    <td id="item"></td>
+                                    <td id="qty"></td>
+                                    <td id="unit_price"></td>
+                                    <td id="total_price"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" align="right"><b>Discount</b></td>
+                                    <td id="discount"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" align="right"><b>Total</b></td>
+                                    <td id="grand_total"></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="5">
+                                        <p>Amount Chargeable (in words)</p>
+                                        <h4 id="amt_words"></h4>
+                                        <br><br><br><br>
+                                        <p>
+                                            <b>GST No: AADCK7606GSD002</b><br>
+                                            <b>Company's PAN: AADCK7606G</b>
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                   <td colspan="2">
+                                       <p>Declartion: We declare that this invoice shows the actual price of the goods described and that  all particulars are true and correct.<br>All the above amount is inclusive of tax</p>
+                                   </td>
+                                   <td colspan="3">
+                                       <p align="right"><b>For Unimax Enterprises.</b></p><br><br><br>
+                                       <p align="right">Authorised Signature</p>
+                                   </td> 
+                                </tr>
+                            </table>
+                            <p align="middle">This is Computer Generated Invoice.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -144,12 +130,13 @@
                 var order_id = url_data[3];
                 var barcodes = (url_data[0].split('$')).slice(0, -1);
                 var quantity = (url_data[1].split('#')).slice(0, -1);
-
+                $("#error_data").hide();
                 $.ajax(
                       {
                             type: 'post',
                             url: "{{warehouse_service_url}}"+"invoice/",
-                            headers: {'X-Authorization-Token' : "{{request.session.userservice_key}}"},
+                            headers: {'content_type':'application/json',
+                                        'X-Authorization-Token' : "{{request.session.userservice_key}}"},
                             dataType: 'json',
                             data: JSON.stringify({
                                                     'order_id': order_id,
@@ -166,6 +153,14 @@
                                 else{
                                     result = data;  
                                 }
+                                if(result['responseCode']){
+                                    $("#invoice_data").hide();
+                                    $("#error_data").show();
+                                    $("#error_data").html("<div class='well'><div class='text-center' style='color:red;'><h4>"+result['Message']+"</h4><h4>Please Check that barcode you have scanned is correct.</h4></div></div>");
+                                }
+                                else{
+                                    populate_invoice(result);
+                                }
                               // swal({
                               //   title: "Success!!!",
                               //   text: result['responseData'],
@@ -181,6 +176,29 @@
                             },
                         });
             });
+
+            function populate_invoice(result){
+                console.log(result);
+                $("#invoice_no").html("<b>Invoice No. </b>"+ result['order_id']);
+                $("#dated").html("<b>Dated: </b>"+ result['created_on']);
+                $("#address").html("<p>Buyer</b><h4><b>"+result['client_name']+"</b></h4><p>"+result['address_line1']+"<br>"+result['area']+"<br>"+result['city']+"-"+result['pincode']+" "+result['state']+"<br>Mobile: "+result['phone']+"</p>");
+                for(i=0;i<result['itemresponse'].length;i++){
+                    $("#sr_no").append("<b>"+(i+1)+"</b><br>");
+                    $("#item").append("<b>"+result['itemresponse'][i]['itemname']+"</b><br>");
+                    $("#qty").append("<b>"+result['itemresponse'][i]['quantity']+"</b><br>");
+                    $("#unit_price").append("<b>"+result['itemresponse'][i]['selling_price']+"</b><br>");
+                    $("#total_price").append("<b>"+result['itemresponse'][i]['total_product_price']+".0</b><br>");
+                }
+                $("#item").append("<br><br><br>");
+                $("#total_price").append("<br><br><br>");
+                for(j=0;j<result['tax'].length;j++){
+                    $("#item").append("<h5 align='right'><b>GST for item "+(j+1)+" @ "+result['tax_percent'][j]+"%</b></h5>");
+                    $("#total_price").append("<h5><b>"+result['tax'][j]+".0</b></h5>");
+                }
+                $("#discount").html("<b>"+result['discount']+"</b>");
+                $("#grand_total").html("<b>"+result['total_amount_str']+".0</b>");
+                $("#amt_words").html("<b>Indian Rupees "+result['amt_in_words']+" Only.</b>");
+            }
         </script>
     </body>
 </html>

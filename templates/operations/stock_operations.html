@@ -3,7 +3,6 @@
 		{% load staticfiles %}
 		<title> Unimax|Operations</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}" />
 		<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
 		<link rel="stylesheet" href="{% static 'css/menubar_style.css' %}">
     <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}" />
@@ -26,8 +25,6 @@
 		<script src="{% static 'js/bootstrap.min.js' %}"></script>
 		<script src="{% static 'js/jquery-ui-1.11.4.min.js' %}"></script>
     <script src="{% static 'js/common.js' %}"></script>
-    <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
-    <script src="{% static 'js/jquery.canvasjs.min.js' %}"></script>
     <script src="{% static 'js/sweetalert.min.js' %}"></script>	
     <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/1.3.1/js/dataTables.buttons.min.js"></script>
@@ -57,9 +54,7 @@
                           <li><a id="product_url" href="/erp/catalog/view"><strong>Products</strong></a></li>
                           <li><a id="operation_url" href="/operations/"> <strong>Operations</strong></a></li>
                           <li class="active"><a href="/operations/stock/" id="stock"><strong>Stock</strong></a></li>
-                         <!--  <li><a href=/operational_dashboard/after_dispatch> <strong>After Dispatch Status</strong></a></li> -->
-          						
-          						  </ul>
+                        </ul>
                     		<ul class="nav navbar-nav pull-right">
                         		<li><a href="/logout/"><strong><span class="glyphicon glyphicon-log-out"></span>Logout</strong></a></li>
                     		</ul>
@@ -126,39 +121,7 @@
             
           }
         }
-        // function populate_stock_table(result){
-        //   for(i=0;i<result.length;i++){
-        //     product_id = document.createTextNode(result[i]['product_id']);
-        //     product_name = document.createTextNode(result[i]['product_name']);
-        //     quantity = document.createTextNode(result[i]['quantity']);
-        //     fulfilled_qty = document.createTextNode(result[i]['fulfilled_qty']);
-
-        //     tabBody=document.getElementById("stock_body");
-        //     row=document.createElement("tr");
-        //     row.setAttribute('id',product_id);
-        //     cell1 = document.createElement("td");
-        //     cell2 = document.createElement("td");
-        //     cell3 = document.createElement("td");
-        //     cell4 = document.createElement("td");
-            
-        //     cell1.appendChild(product_id);
-        //     cell2.appendChild(product_name);
-        //     cell3.appendChild(quantity);
-        //     cell4.appendChild(fulfilled_qty);
-            
-        //     row.appendChild(cell1);
-        //     row.appendChild(cell2);
-        //     row.appendChild(cell3);
-        //     row.appendChild(cell4);
-            
-
-        //     tabBody.appendChild(row);
-        //   }
-        // }
-
-
-
-       });
+      });
     </script>  
   </body>
 </html>

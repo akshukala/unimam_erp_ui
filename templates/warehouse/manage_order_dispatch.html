@@ -67,6 +67,7 @@
       <div class="row">
         <div><h4 id="order_cnt" style="color: #57afdb;"></h4></div>
         <div class="col-md-12">
+          <div class="errors"></div>
           <div class="table-responsive">   
             <table id="order_dispatch_table" class="table table-striped table-bordered text-center vcenter table-responsive">
               <thead>
@@ -197,13 +198,93 @@
               else{
                 $("#d"+fid).show();
               }
+            
+            dispatch_button.onclick = function(){
+              var errors=[];
+              var order = $(this).attr('id');
+              var delivery_challan = $("#c"+order).val();
+              var driver = $("#b"+order).val();
+              $("#selectProduct").css({"border-color": "#ccc"});
+              $("#quantity").css({"border-color": "#ccc"});
+              if(delivery_challan.length == 0) {
+                errors[errors.length] = "Please enter challan number.";
+                $("#c"+order).css({"border-color": "#ff4c4c"});
+                $("#c"+order).focus();
+              }
+              if(driver.length == 0) {
+                errors[errors.length] = "Enter the driver name.";
+                $("#b"+order).css({"border-color": "#ff4c4c"});
+                $("#b"+order).focus();
+              }
+              if (errors.length > 0) {
+                reportErrors(errors);
+                return false;
+              }
+              swal({
+                  title: 'Are you sure?',
+                  text: "You won't be able to revert this!",
+                  type: 'info',
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '#d33',
+                  confirmButtonText: 'Yes, Mark it!',
+                  cancelButtonText: 'No',
+                  closeOnConfirm: true
+              }, function() {
+                $.ajax(
+                      {
+                          type:'put',
+                          url: "{{ warehouse_service_url }}orders/",
+                          headers: {'content_type':'application/json',
+                                          'X-Authorization-Token' : "{{request.session.userservice_key}}"},
+                          dataType: 'json',
+                          data: JSON.stringify({ 'order_id': order,
+                                                 'challan': delivery_challan,
+                                                 'driver': driver
+                                              }),
+                          success : function(data)
+                              {   
+                                  console.log(data);
+                                  if(data['responseData']){
+                                      result = data['responseData'];
+                                  }
+                                  else{
+                                      result = data;  
+                                  }
+                                  swal({
+                                    title: "Success!!!",
+                                    text: result,
+                                    type: "success",
+                                  },
+                                  function(){
+                                    location.reload();
+                                  });  
+                              },
+                          error : function(error)
+                                  {
+                                      window.alert(error['responseText'])
+                                  }
+                            });
+                });              
             }
+          }
       }
       function DeleteRows() {
             var rowCount = order_dispatch_table.rows.length;
             for (var i = rowCount - 1; i > 0; i--) {
                   order_dispatch_table.deleteRow(i);
               }
+        }
+      function reportErrors(errors){
+          $('.errors').empty();
+          var msg = [];
+          for (var i = 0; i<errors.length; i++) {
+            var numError = i + 1;
+            msg [i]= "\n" + numError + ". " + errors[i] ;
+          }
+          $.each(msg, function(){
+            $('.errors').append("<div class='alert alert-danger alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button>" + this +"</div>");
+          });
         }
     </script>
   </body>
