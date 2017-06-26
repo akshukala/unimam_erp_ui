@@ -22,10 +22,10 @@
       .pp {
         color: #54cff8 !important;
       }
-      #related_farmers{
+      #related_clients{
           overflow:hidden;
           overflow-y:scroll;
-          height:170px;
+          height:150px;
           font-size:13px;
         }
     </style>
@@ -38,68 +38,72 @@
         <div class="row">
           <div class="col-md-2 panel panel-heading pp">Contact Information</div>
         </div>
-        
-        <div class="row form-group">
-          <label class="col-md-1 control-label" for="client_name">Name</label>  
-          <div class="col-md-4">
-            <div class="input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-              <input id="client_name" name="client_name" placeholder="" class="form-control input-md" type="text">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="row form-group">
+              <label class="col-md-2 control-label" for="client_name">Name</label>  
+              <div class="col-md-4">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                  <input id="client_name" name="client_name" placeholder="" class="form-control input-md" type="text">
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div class="row form-group">
-          <label class="col-md-2 control-label" for="mobile">Mobile No.</label>
-          <div class="col-md-3">
-            <div class="input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-phone"></i></span>
-              <input id="mobile" maxlength="10" name="mobile" placeholder="xxxxxxxxxxxx" class="form-control input-md" type="number" value={{mobile}}>
+            <div class="row form-group">
+              <label class="col-md-2 control-label" for="mobile">Mobile No.</label>
+              <div class="col-md-3">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="glyphicon glyphicon-phone"></i></span>
+                  <input id="mobile" maxlength="10" name="mobile" placeholder="xxxxxxxxxxxx" class="form-control input-md" type="number" value={{mobile}}>
+                </div>
+              </div>
+                
+              <div class="col-md-1">
+                <a id="add_mobile" onclick=add_mobile()><i class="glyphicon glyphicon-plus"></i></a>
+              </div>  
+              <div class="col-md-6" id="mobile_numbers"></div>
             </div>
-          </div>
             
-          <div class="col-md-1">
-            <a id="add_mobile" onclick=add_mobile()><i class="glyphicon glyphicon-plus"></i></a>
-          </div>  
-          <div class="col-md-6" id="mobile_numbers"></div>
-        </div>
-        
-        <!-- <div class="row form-group">
-          
-        </div> -->
+            <!-- <div class="row form-group">
+              
+            </div> -->
 
-        <div class="row form-group">
-          <label class="col-md-2 control-label" for="whatsapp">Whatsapp No.</label>
-          <div class="col-md-3">
-            <div class="input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-phone"></i></span>
-              <input id="whatsapp" maxlength="10" name="whatsapp" placeholder="xxxxxxxxxxxx" class="form-control input-md" type="number" value={{mobile}}>
+            <div class="row form-group">
+              <label class="col-md-2 control-label" for="whatsapp">Whatsapp No.</label>
+              <div class="col-md-3">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="glyphicon glyphicon-phone"></i></span>
+                  <input id="whatsapp" maxlength="10" name="whatsapp" placeholder="xxxxxxxxxxxx" class="form-control input-md" type="number" value={{mobile}}>
+                </div>
+              </div>
+                
+              <div class="col-md-1">
+                <a id="add_whatsapp" onclick=add_whatsapp()><i class="glyphicon glyphicon-plus"></i></a>
+              </div>
+              <div class="col-md-6" id="whatsapp_numbers"></div> 
+            </div>
+
+            <!-- <div class="row form-group">
+              
+            </div> -->
+
+            <div class="row form-group">
+              <label class="col-md-2 control-label" for="landline">Landline No.</label>
+              <div class="col-md-3">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="glyphicon glyphicon-phone"></i></span>
+                  <input id="landline" maxlength="11" name="landline" placeholder="xxxxxxxxxxxxx" class="form-control input-md" type="number" value={{mobile}}>
+                </div>
+              </div>
+                
+              <div class="col-md-1">
+                <a id="add_landline" onclick=add_landline()><i class="glyphicon glyphicon-plus"></i></a>
+              </div>
+              <div class="col-md-6" id="landline_numbers"></div>
             </div>
           </div>
-            
-          <div class="col-md-1">
-            <a id="add_whatsapp" onclick=add_whatsapp()><i class="glyphicon glyphicon-plus"></i></a>
-          </div>
-          <div class="col-md-6" id="whatsapp_numbers"></div> 
-        </div>
-
-        <!-- <div class="row form-group">
-          
-        </div> -->
-
-        <div class="row form-group">
-          <label class="col-md-2 control-label" for="landline">Landline No.</label>
-          <div class="col-md-3">
-            <div class="input-group">
-              <span class="input-group-addon"><i class="glyphicon glyphicon-phone"></i></span>
-              <input id="landline" maxlength="11" name="landline" placeholder="xxxxxxxxxxxxx" class="form-control input-md" type="number" value={{mobile}}>
-            </div>
-          </div>
-            
-          <div class="col-md-1">
-            <a id="add_landline" onclick=add_landline()><i class="glyphicon glyphicon-plus"></i></a>
-          </div>
-          <div class="col-md-6" id="landline_numbers"></div>
+          <div class="col-md-4"><div class="col-md-12" id="related_clients"></div></div>
         </div>
 
         <!-- <div class="row form-group">
@@ -145,7 +149,7 @@
         
         <div class="form-group row">
           <div class="col-md-8 text-center">
-            <input  type = "button" id="save_client" class="btn btn-large btn-primary" value="Save Client Information" /> 
+            <input  type = "button" id="save_client" class="btn btn-large btn-success" value="Save Client Information" /> 
             <button class="btn btn-large btn-danger" type="button" onclick=history.go(-1)> Cancel </button>
           </div>
         </div>
@@ -165,6 +169,66 @@
           $( "#state" ).autocomplete({
               source: availableTags
           });
+
+          $("#area").autocomplete({
+                  source: function(request, response) {
+                    var autocomplete_url = "{{client_service_url}}autocomplete/";
+                    $.ajax({
+                        url: autocomplete_url,
+                        type : "get",
+                        data :{
+                            "type": "area",
+                            "term": request.term,
+                        },
+                        success:function(data){
+                            console.log(data["responseData"]);
+                            response(data["responseData"]);
+                        }
+                    });
+                  },
+                  select: function(event, ui) {
+                    //$("#pin_code").val(ui.item.pin_code);
+                  }
+          });
+
+          $("#area").keyup(function(event){
+                if(event.keyCode == 13){
+                    var area = $("#area").val();
+                    $.ajax(
+                    {
+                      url: "{{client_service_url}}" + "related_clients/?area="+area,
+                      headers: {'X-Authorization-Token':"{{request.session.userservice_key}}"},
+                      type: 'get',
+                      dataType: 'json',
+                    success : function(data)
+                    {
+                        console.log(data);
+                        var result;
+                        if(data['responseData']){
+                          result = data['responseData'];
+                        }
+                        else{
+                            result = data;  
+                        }
+                        var related_data = "<h5>Extra Information (Clients in this area.)</h5>";
+                        if(result.clients.length ==0){
+                          related_data +="<hr>No clients in this Area.";
+                        }
+                        else{
+                          $.each(result.clients, function(index, rel_data){
+                                related_data +="<p><a href='/erp/client/view/"+rel_data.client_id+"' target='_blank'>"+rel_data.name+"</a>&emsp;</p>";
+                          });
+                        }
+                        $("#related_clients").html(related_data);
+                    },
+                    error : function(data)
+                    {
+                        alert("Error in Getting Farmer Information");
+                    },
+                });
+                }
+            });
+
 
           var currentUrl = window.location.href;
           url_id = currentUrl.split('/edit/');

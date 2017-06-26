@@ -53,12 +53,12 @@
           height:180px;
           font-size:13px;
         }
-        /*#related_farmers{
+        #related_clients{
           overflow:hidden;
           overflow-y:scroll;
-          height:170px;
+          height:150px;
           font-size:13px;
-        }*/
+        }
         #table-scroll {
         height:200px;
         overflow:auto;  
@@ -141,10 +141,10 @@
           <div class="col-md-12" id="new_comment"></div>
         </div>
       </div>
-      <!-- <div class="row panel-heading">
+      <div class="row panel-heading">
         <div class="col-md-8" id="coupon_div"></div>
-        <div class="col-md-4"><div class="col-md-12" id="related_farmers"></div></div>
-      </div> -->
+        <div class="col-md-4"><div class="col-md-12" id="related_clients"></div></div>
+      </div>
       <div class="col-md-12 row panel-heading"><b> Order History <span id="order_count"></span> </b></div>
       <div class="col-md-12">
         <div id="no_orders"> <h3>No Past Orders Found </h3></div>
@@ -535,26 +535,16 @@
             new_comment += " <input class='btn-block btn btn-success' onclick=submitComment() value=Submit></input>";
             $("#new_comment").html(new_comment);
 
-            // var related_data = "<h5>Extra Information</h5>";
-            // if(info.related_data.farmer && info.related_data.order){
-            //   if(info.related_data.order.length==0){
-            //     related_data +="<hr>No orders at this Post Office.";
-            //   }else{
-            //     $.each(info.related_data.order, function(index, rel_data){
-            //         console.log(rel_data.order_id);
-            //         related_data +="<p><a href='/crm/salesorder/view/"+rel_data.order_id+"' target='_blank'>"+rel_data.name+"</a>&emsp;"+rel_data.status +"<button class='btn btn-default btn-xs' data-toggle='tooltip' data-placement='bottom' title='"+rel_data.order_item+"'><span class='glyphicon glyphicon-comment'></span></button></p>";
-            //     });
-            //   }
-            //   $.each(info.related_data.farmer, function(index, rel_data){
-            //         related_data +="<p><a href='/crm/farmer/view/"+rel_data.farmer_id+"' target='_blank'>"+rel_data.name+"</a></p>";
-            //   });
-            // }
-            // else{
-            //   $.each(info.related_data.order, function(index, rel_data){
-            //         related_data +="<p><a href='/crm/salesorder/view/"+rel_data.order_id+"' target='_blank'>"+rel_data.name+"</a>&emsp;"+rel_data.status+"<button class='btn btn-default btn-xs' data-toggle='tooltip' data-placement='bottom' title='"+rel_data.order_item+"'><span class='glyphicon glyphicon-comment'></span></button></p>";
-            //   });
-            // }
-            // $("#related_farmers").html(related_data);
+            var related_data = "<h5>Extra Information (Clients in this area.)</h5>";
+            if(info.related_data.clients.length ==0){
+              related_data +="<hr>No clients in this Area.";
+            }
+            else{
+              $.each(info.related_data.clients, function(index, rel_data){
+                    related_data +="<p><a href='/erp/client/view/"+rel_data.client_id+"' target='_blank'>"+rel_data.name+"</a>&emsp;</p>";
+              });
+            }
+            $("#related_clients").html(related_data);
             
             if (info.orders.length > 0){
                 $("#no_orders").hide();

@@ -199,13 +199,14 @@
         if(SaleOrderHistory.length > 0){
           var order_history_row = '';
           $.each(SaleOrderHistory, function(index,orderHistory){
-              
-              order_history_row += "<tr>";
-              order_history_row += "<td>" + orderHistory.status + "</td>";
-              temp = orderHistory.created_on.split('T');
-              created_date = temp[0] + " " + temp[1].split('.')[0];
-              order_history_row += "<td>" + created_date + "</td>";
-              order_history_row += "</tr>";
+            	order_history_row += "<tr>";
+              	order_history_row += "<td>" + orderHistory.status + "</td>";
+              	temp = orderHistory.created_on.split('T');
+              	created_date = temp[0] + " " + temp[1].split('.')[0];
+              	var str_to_date = new Date(created_date)
+              	var splited_date = str_to_date.toString().split(" ");
+              	order_history_row += "<td>" + splited_date[2] + " " + splited_date[1] + " " + splited_date[3] + " " + splited_date[4] + "</td>";
+              	order_history_row += "</tr>";
 
           });
           $("#order_history_table > tbody").html(order_history_row);

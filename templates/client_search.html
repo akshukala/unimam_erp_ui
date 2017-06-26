@@ -13,7 +13,7 @@
         </div>
         <div class="col-md-1">
           <label class="radio-inline">
-            <input name="search_type" type="radio" value="name"><span class="glyphicon glyphicon-user"></span>Name
+            <input name="search_type" id="clientname" type="radio" value="name"><span class="glyphicon glyphicon-user"></span>Name
           </label>
         </div>
         <div class="col-md-1">
@@ -79,6 +79,38 @@
                         success:function(data){
                             console.log(data["responseData"]);
                             response(data["responseData"]);
+                        }
+                    });
+                  },
+                  select: function(event, ui) {
+                    //$("#pin_code").val(ui.item.pin_code);
+                  }
+                });
+              }
+            });
+
+            $("#clientname").change(function(){
+              if (this.checked) {
+                $("#search_term").autocomplete({
+                  source: function(request, response) {
+                    var autocomplete_url = "{{client_service_url}}autocomplete/";
+                    $.ajax({
+                        url: autocomplete_url,
+                        type : "get",
+                        data :{
+                            "type": "name",
+                            "term": request.term,
+                        },
+                        success:function(data){
+                            console.log(data["responseData"]);
+                            var availableTags = [];
+                            for(var x = 0;x<data['responseData'].length;x++){
+                              availableTags.push(data['responseData'][x]['client_name']);
+                            }         
+                            $( "#search_term" ).autocomplete({
+                              source: availableTags
+                             
+                            });
                         }
                     });
                   },
